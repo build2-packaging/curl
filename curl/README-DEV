@@ -1,0 +1,16 @@
+This document describes how curl was packaged for build2. In particular, this
+understanding will be useful when upgrading to a new upstream version. See
+../README-DEV for general notes on curl packaging.
+
+Symlink the required upstream directories into curl/:
+
+$ ln -s ../../upstream/{src,lib} curl
+$ ln -s lib/{strtoofft,nonblock,warnless,curl_ctype}.c curl
+$ ln -s src/tool_hugehelp.c.cvs curl/tool_hugehelp.c
+$ ln -s ../../libcurl/libcurl/curl_config.h curl
+
+Patch curl to use CA certificate bundle provided by the
+libca-certificates-curl package by default:
+
+$ cp curl/src/tool_main.c curl
+$ patch -p0 <curl/tool_main.c.patch

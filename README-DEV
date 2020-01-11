@@ -1,0 +1,151 @@
+This document describes an approach applied to packaging cURL for build2. In
+particular, this understanding will be useful when upgrading to a new upstream
+version.
+
+The upstream package contains the libcurl library and the curl program that we
+package separately (see the respective README-DEV files for details). It also
+contains tests that we currently don't package.
+
+We add the upstream package as a git submodule and symlink the required files
+and subdirectories into the build2 package subdirectories. Then, when required,
+we "overlay" the upstream with our own source files, placing them into the
+library directory.
+
+Note that symlinking upstream submodule subdirectories into a build2 package
+subdirectory results in creating intermediate build files (.d, .o, etc) inside
+upstream directory while building the package in source tree. That's why we
+need to make sure that packages do not share upstream source files via
+subdirectory symlinks, not to also share the related intermediate files. If
+several packages need to compile the same upstream source file, then only one
+of them can symlink it via the parent directory while others must symlink it
+directly. We also add the `ignore = untracked` configuration option into
+.gitmodules to make sure that git ignores the intermediate build files under
+upstream/ subdirectory.
+
+The upstream package can be configured to contain a specific feature set. We
+reproduce the union of features configured for the upstream source package in
+Debian and Fedora distributions. The configuration options defining these sets
+are specified in the Debian's rules and Fedora's RPM .spec files. These files
+can be obtained as follows:
+
+$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.67.0-2.debian.tar.xz
+$ tar xf curl_7.67.0-2.debian.tar.xz debian/rules
+
+$ wget https://kojipkgs.fedoraproject.org//packages/curl/7.67.0/2.fc32/src/curl-7.67.0-2.fc32.src.rpm
+$ rpm2cpio curl-7.67.0-2.fc32.src.rpm | cpio -civ '*.spec'
+
+As a side note, on Debian and Fedora the source, library, headers, and tools
+are packaged as follows:
+
+                src   library   headers               tool
+Debian/Ubuntu:  curl  libcurl4  libcurl4-openssl-dev  curl
+Fedora/RHEL:    curl  libcurl   libcurl-devel         curl
+
+Search for the Debian and Fedora packages at https://packages.debian.org/search
+and https://apps.fedoraproject.org/packages/.
+
+Here are the discovered configuration options.
+
+Debian:
+
+  --disable-symbol-hiding --enable-versioned-symbols
+  --enable-threaded-resolver --with-lber-lib=lber
+  --with-gssapi=/usr --with-libssh2 --with-nghttp2
+  --with-zsh-functions-dir=/usr/share/zsh/vendor-completions
+  --with-ca-path=/etc/ssl/certs
+
+Fedora:
+
+  --disable-static --enable-symbol-hiding --enable-ipv6
+  --enable-threaded-resolver --with-gssapi --with-nghttp2 --with-ssl
+  --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt
+  --enable-ldap --enable-ldaps --enable-manual --with-brotli --with-libidn2
+  --with-libmetalink --with-libpsl --with-libssh
+
+The union of these feature sets translates into the following options:
+
+  --enable-symbol-hiding --enable-versioned-symbols
+  --enable-threaded-resolver --with-lber-lib=lber --with-gssapi --with-libssh2
+  --with-nghttp2 --with-zsh-functions-dir=<path> --with-ca-path=<path>
+  --with-ca-bundle=<path> --enable-ipv6 --with-ssl --enable-ldap
+  --enable-ldaps --enable-manual --with-brotli --with-libidn2
+  --with-libmetalink --with-libpsl --with-libssh
+
+We, however, drop the external dependencies that are not packaged for build2,
+disable default CA bundle/directory and use --with-ca-fallback instead,
+explicitly request to use zlib and end up with the following options:
+
+  --enable-symbol-hiding --enable-versioned-symbols --enable-threaded-resolve
+  --enable-ipv6 --with-ssl --with-zlib --disable-ldap --disable-ldaps
+  --disable-ares --disable-esni --disable-manual --without-lber-lib
+  --without-gssapi --without-libssh --without-libssh2 --without-nghttp2
+  --without-zsh-functions-dir --without-brotli --without-libidn2
+  --without-libmetalink --without-libpsl --without-ca-bundle --without-ca-path
+  --with-ca-fallback
+
+See the configuration options description at the "Install from source" page
+(https://curl.haxx.se/docs/install.html).
+
+On Windows and MacOS we also enable the SSL backend provided by the system and
+make it a default one. On MacOS we add the following configuration options:
+
+  --with-secure-transport --with-default-ssl-backend=secure-transport
+
+Note, though, that on MacOS building curl with GCC fails for the Secure
+Transport backend enabled (see curl issue 4821 for details). Thus, we disable
+it for GCC on MacOS.
+
+For MSVC there is no easy way to request that via the configuration script, so
+we apply the following patch to winbuild/MakefileBuild.vc:
+
+--- winbuild/MakefileBuild.vc.orig	2020-01-11 18:04:21.353519085 +0300
++++ winbuild/MakefileBuild.vc	2020-01-11 18:08:35.962111020 +0300
+@@ -345,7 +345,7 @@ USE_WINSSL  = true
+ !IF "$(USE_SSPI)"!="true"
+ !ERROR cannot build with WinSSL without SSPI
+ !ENDIF
+-SSPI_CFLAGS = $(SSPI_CFLAGS) /DUSE_SCHANNEL
++SSPI_CFLAGS = $(SSPI_CFLAGS) /DUSE_SCHANNEL /DCURL_DEFAULT_SSL_BACKEND=\"schannel\" /DCURL_CA_FALLBACK=1
+ WIN_LIBS    = $(WIN_LIBS) Crypt32.lib
+ !ENDIF
+
+Normally, when packaging a project, we need to replace some auto-generated
+headers with our own implementations and deduce compilation/linking options.
+For cURL we can rely for that on m4/curl-compilers.m4, {lib,src}/Makefile.am,
+and winbuild/MakefileBuild.vc. In practice, however, that can be uneasy and
+error prone, so you may also need to see the auto-generated files and the
+actual compiler and linker command lines in the build log. If that's the case,
+you can configure/build the upstream package on the platform of interest
+running the following commands in the upstream project root directory.
+
+On POSIX and for MinGW GCC (add --with-secure-transport
+--with-default-ssl-backend=secure-transport for MacOS and --with-schannel
+--with-default-ssl-backend=schannel for MinGW GCC):
+
+$ ./buildconf
+$ mkdir build
+$ cd build
+$ ../configure --enable-symbol-hiding --enable-versioned-symbols \
+  --enable-threaded-resolve --enable-ipv6 --with-ssl --with-zlib \
+  --disable-ldap --disable-ldaps --disable-ares --disable-esni \
+  --disable-manual --without-lber-lib --without-gssapi --without-libssh \
+  --without-libssh2 --without-nghttp2 --without-zsh-functions-dir \
+  --without-brotli --without-libidn2 --without-libmetalink --without-libpsl \
+  --without-ca-bundle --without-ca-path --with-ca-fallback >build.log 2>&1
+$ make V=1 >>build.log 2>&1
+
+For MSVC:
+
+> buildconf.bat
+> cd winbuild
+> nmake /f Makefile.vc mode=dll ENABLE_WINSSL=yes ^
+    WITH_SSL=dll ENABLE_OPENSSL_AUTO_LOAD_CONFIG=no ^
+    WITH_ZLIB=dll >build.log 2>&1
+
+See the upstream/docs/INSTALL.md for details.
+
+When the packaging is complete, build all the project packages in source tree
+and make sure that no cURL headers are included from the system, running the
+following command from the project root:
+
+$ fgrep -a -e /usr/include/curl `find . -type f -name '*.d'`

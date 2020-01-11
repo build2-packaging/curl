@@ -1,0 +1,10 @@
+# file      : build/export.build
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+$out_root/
+{
+  include curl/
+}
+
+export $out_root/curl/exe{curl}

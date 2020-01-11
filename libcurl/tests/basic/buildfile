@@ -1,0 +1,7 @@
+# file      : tests/basic/buildfile
+# copyright : Copyright (c) 2009-2019 Code Synthesis Tools CC
+# license   : cURL License; see accompanying COPYING file
+
+import libs = libcurl%lib{curl}
+
+exe{driver}: {h c}{*} $libs testscript

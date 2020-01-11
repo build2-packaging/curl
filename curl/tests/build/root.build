@@ -1,0 +1,16 @@
+# file      : tests/build/root.build
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+# We need to configure C module to obtain the target information (see below).
+#
+using c
+
+# Setup the curl program that we are testing.
+#
+import curl = curl%exe{curl}
+testscript{*}: test = $curl
+
+# Specify the test target for cross-testing.
+#
+test.target = $c.target

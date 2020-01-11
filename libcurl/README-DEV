@@ -1,0 +1,39 @@
+This document describes how libcurl was packaged for build2. In particular,
+this understanding will be useful when upgrading to a new upstream version.
+See ../README-DEV for general notes on curl packaging.
+
+Symlink the required upstream directories into libcurl/:
+
+$ ln -s ../../upstream/{lib,include} libcurl
+
+Create libcurl/curl_config.h using as a base the upstream's auto-generated
+header and/or the corresponding .m4 and configure.ac files.
+
+Some macro values cannot be easily determined at the preprocessing time. We
+define them based on the supported platform tests and add libcurl/assert.c,
+containing compile-time assertions for the macros in question.
+
+Copy the upstream's libtool-generated for MacOS libcurl-symbols.expsym file
+and comment out (with #) the _curl_jmpenv symbol in it since it causes the
+'cannot export hidden symbol' linked warning on MacOS.
+
+Note that re-creating libcurl/curl_config.h from scratch every time we upgrade
+to a new upstream version would be a real pain. Instead we can only (un)define
+the newly introduced macros, comparing the already defined and currently used
+macro sets. For the comparison we can use config-win32.h and auto-generated on
+Linux upstream's curl_config.h:
+
+$ for m in `cat <upstream-build-dir>/lib/curl_config.h libcurl/lib/config-win32.h | \
+            sed -n 's/^.*#\s*\(define\|undef\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | \
+            sort -u`; do
+    if grep -q -e "\b$m\b" `find -L . ../curl -name '*.h' -a ! -name curl_config.h -a ! -name 'config-*.h' -o -name '*.c'`; then
+      echo "$m"
+    fi
+  done >used-macros
+
+$ cat libcurl/curl_config.h | \
+  sed -n 's/^.*#\s*\(define\|undef\)\s\{1,\}\([_A-Z0-9]\{1,\}\)\(\s.*\)\{0,1\}$/\2/p' | \
+  sort -u >defined-macros
+
+$ diff defined-macros used-macros | grep '<' >remove-macros
+$ diff defined-macros used-macros | grep '>' >add-macros

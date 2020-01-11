@@ -1,0 +1,14 @@
+# file      : build/root.build
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+using c
+
+h{*}: extension = h
+c{*}: extension = c
+
+if ($c.target.system == 'win32-msvc')
+  c.poptions += -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+
+if ($c.class == 'msvc')
+  c.coptions += /wd4251 /wd4275 /wd4800

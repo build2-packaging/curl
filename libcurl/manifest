@@ -1,0 +1,21 @@
+: 1
+name: libcurl
+version: 7.67.0-a.0.z
+project: curl
+summary: C library for transferring data with URLs
+license: cURL ; MIT/X derivate license.
+topics: C, HTTP, FTP, URL, data transfer
+description-file: README
+url: https://curl.haxx.se/
+doc-url: https://curl.haxx.se/libcurl/c/
+src-url: https://git.build2.org/cgit/packaging/curl/curl/tree/libcurl/
+package-url: https://git.build2.org/cgit/packaging/curl/
+email: curl-library@cool.haxx.se    ; Mailing list.
+package-email: packaging@build2.org ; Mailing list.
+build-email: builds@build2.org
+builds: all
+depends: * build2 >= 0.12.0
+depends: * bpkg >= 0.12.0
+depends: libz >= 1.2.1100
+depends: libcrypto >= 1.1.1
+depends: libssl >= 1.1.1

@@ -1,0 +1,9 @@
+# file      : tests/build/bootstrap.build
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+project = # Unnamed tests subproject.
+
+using config
+using test
+using dist

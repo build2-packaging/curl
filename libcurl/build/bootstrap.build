@@ -1,0 +1,35 @@
+# file      : build/root.build
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+project = libcurl
+
+using version
+using config
+using test
+using install
+using dist
+
+# The cURL version has the <major>.<minor>.<patch> form and follows the semver
+# semantics. Specifically, the major version is increased when really big
+# changes are made, the minor version when new features are added, and the
+# patch version is increased for bug fixes. See also:
+#
+# https://curl.haxx.se/docs/versions.html
+#
+# The ABI version doesn't correlate with the release version and is assigned
+# via the libtool's -version-info <current>:<revision>:<age> option
+# (VERSIONINFO in lib/Makefile.am). As it follows from the comment in the
+# makefile, the major version (current - age) is incremented for backwards-
+# incompatible ABI changes. See also:
+#
+# https://curl.haxx.se/libcurl/abi.html
+#
+if ($version.major == 7 && $version.minor == 67 && $version.patch == 0)
+{
+
+  abi_version_major = 4
+  abi_version = "$abi_version_major.6.0" # <current - age>.<age>.<revision>
+}
+else
+  fail 'increment the ABI version?'

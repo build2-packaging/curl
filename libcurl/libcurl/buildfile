@@ -1,0 +1,128 @@
+# file      : libcurl/buildfile
+# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
+# license   : cURL License; see accompanying COPYING file
+
+# Version script.
+#
+define vsc: file
+vsc{*}: extension = vers
+
+# Exported symbols.
+#
+define esm: file
+esm{*}: extension = expsym
+
+import imp_libs  = libssl%lib{ssl}
+import imp_libs += libcrypto%lib{crypto}
+import imp_libs += libz%lib{z}
+
+lib{curl}: {h c}{**} $imp_libs
+
+tclass = $c.target.class
+tsys   = $c.target.system
+
+linux   = ($tclass == 'linux')
+bsd     = ($tclass == 'bsd')
+macos   = ($tclass == 'macos')
+windows = ($tclass == 'windows')
+
+lib{curl}: vsc{libcurl}:         include = ($linux || $bsd ? adhoc : false)
+lib{curl}: esm{libcurl-symbols}: include = ($macos         ? adhoc : false)
+
+vsc{libcurl}: lib/in{libcurl}
+{
+  in.symbol = '@'
+
+  CURL_LT_SHLIB_VERSIONED_FLAVOUR = 'OPENSSL_'
+}
+
+# Build options.
+#
+c.poptions += -DBUILDING_LIBCURL -DHAVE_CONFIG_H \
+              -DOS="\"$c.target\"" -DVERSION="\"$version.project_id\""
+
+if! $windows
+  c.poptions += -DCURL_HIDDEN_SYMBOLS
+
+# Note that the upstream package uses the -pthread compiler/linker option on
+# Linux and FreeBSD. The option is unsupported by build2 so we pass
+# -D_REENTRANT and -lpthread preprocessor/linker options instead.
+#
+switch $tclass, $tsys
+{
+  case 'linux' | 'bsd'
+    c.poptions += -D_REENTRANT
+
+  case 'windows', 'win32-msvc'
+    c.poptions += -DWIN32
+}
+
+c.poptions =+ "-I$src_base" "-I$src_base/include" "-I$src_base/lib"
+
+obja{*}: c.poptions += -DCURL_STATICLIB
+
+if! $windows
+  c.coptions += -fvisibility=hidden
+
+switch $c.class, $tsys
+{
+  case 'gcc'
+  {
+    # Disable warnings that pop up with -Wall -Wextra. Upstream doesn't seem
+    # to care about these and it is not easy to disable specific warnings in a
+    # way that works across compilers/version (some -Wno-* options are only
+    # recognized in newer versions).
+    #
+    c.coptions += -Wno-all -Wno-extra -Wno-deprecated-declarations
+  }
+  case 'msvc'
+  {
+    # Disable warnings that pop up with /W3.
+    #
+    c.coptions += /wd4996
+  }
+}
+
+switch $tclass, $tsys
+{
+  case 'linux' | 'bsd'
+  {
+    # Make sure all symbols are resolvable.
+    #
+    c.loptions += -Wl,--no-undefined
+
+    c.loptions += "-Wl,--version-script=$out_base/libcurl.vers"
+    c.libs     += -lpthread
+  }
+  case 'macos'
+  {
+    c.loptions += "-Wl,-exported_symbols_list,$src_base/libcurl-symbols.expsym"
+    c.libs     += -framework CoreFoundation -framework Security
+  }
+  case 'windows', 'mingw32'
+  {
+    c.loptions += -Wl,--enable-auto-image-base
+    c.libs     += -lws2_32 -lcrypt32
+  }
+  case 'windows'
+  {
+    c.libs += ws2_32.lib crypt32.lib normaliz.lib advapi32.lib
+  }
+}
+
+# Export options.
+#
+lib{curl}:  cc.export.poptions  = "-I$src_base/include"
+liba{curl}: cc.export.poptions += -DCURL_STATICLIB
+
+# See bootstrap.build for details.
+#
+if $version.pre_release
+  lib{curl}: bin.lib.version = @"-$version.project_id"
+else
+  lib{curl}: bin.lib.version = @"-$abi_version_major" linux@"$abi_version"
+
+# Install headers from the include/curl/ subdirectory only.
+#
+h{*}:              install = false
+include/curl/h{*}: install = include/curl/
