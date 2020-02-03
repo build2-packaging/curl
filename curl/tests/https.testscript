@@ -5,10 +5,10 @@
 : default
 :
 {
-  test.options += -sS
-
-  $* 'http://www.example.com' | set s;
-  $* 'https://www.example.com' >"$s"
+  $* -sS 'https://www.build2.org' >>~%EOO%
+    %<!DOCTYPE .*>%
+    %.+
+    EOO
 }
 
 : override
@@ -18,5 +18,5 @@
 : certificates' exit code.
 :
 {
-  $* -s 'https://www.example.com' --capath "$src_base/empty.pem" == 60
+  $* -s 'https://www.build2.org' --capath "$src_base/empty.pem" == 60
 }
