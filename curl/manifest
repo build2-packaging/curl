@@ -1,6 +1,6 @@
 : 1
 name: curl
-version: 7.67.0+3
+version: 7.67.0+4
 summary: Command line tool for transferring data with URLs
 license: cURL ; MIT/X derivate license.
 topics: HTTP, FTP, URL, data transfer
