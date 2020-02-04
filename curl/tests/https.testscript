@@ -25,5 +25,5 @@
 : verbose
 :
 {
-  $* -v 'https://www.example.com' >! 2>&1
+  $* -v --no-tcp-nodelay 'https://www.example.com' >! 2>&1
 }
