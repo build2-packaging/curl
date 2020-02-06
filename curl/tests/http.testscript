@@ -4,7 +4,6 @@
 
 : basic
 :
-$* -sS 'http://www.example.com' >>~%EOO%
-%<!doctype .*>%
-%.+
-EOO
+$* --fail -sS 'http://www.example.com' >>~%EOO%
+  %.+
+  EOO

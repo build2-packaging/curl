@@ -31,7 +31,22 @@ main (int argc, char* argv[])
     CURLcode cr = curl_easy_perform (curl);
 
     if (cr == CURLE_OK)
-      r = 0;
+    {
+      long status;
+      cr = curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &status);
+
+      if (cr == CURLE_OK)
+      {
+        if (status < 400)
+          r = 0;
+        else
+          fprintf (stderr, "HTTP error: status code %ld\n", status);
+      }
+      else
+        fprintf (stderr,
+                 "failed to get HTTP status code: %s\n",
+                 curl_easy_strerror (cr));
+    }
     else
       fprintf (stderr,
                "failed to request '%s': %s\n",

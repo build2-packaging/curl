@@ -5,9 +5,8 @@
 : http
 :
 $* 'http://www.example.com' >>~%EOO%
-%<!doctype .*>%
-%.+
-EOO
+  %.+
+  EOO
 
 : https
 :
@@ -18,8 +17,9 @@ EOO
 if ($c.target.class == 'windows' || \
     $c.target.class == 'macos' && $c.id == 'clang-apple')
 {
-  $* 'http://www.example.com' | set s;
-  $* 'https://www.example.com' >"$s"
+  $* 'https://www.example.com' >>~%EOO%
+    %.+
+    EOO
 }
 else
 {

@@ -5,10 +5,9 @@
 : default
 :
 {
-  test.options += -sS
-
-  $* 'http://www.example.com' | set s;
-  $* 'https://www.example.com' >"$s"
+  $* --fail -sS 'https://www.example.com' >>~%EOO%
+    %.+
+    EOO
 }
 
 : override
