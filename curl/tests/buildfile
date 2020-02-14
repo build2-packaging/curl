@@ -1,5 +1,4 @@
 # file      : tests/buildfile
-# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
 # license   : cURL License; see accompanying COPYING file
 
 ./: testscript{*} file{empty.pem} $curl

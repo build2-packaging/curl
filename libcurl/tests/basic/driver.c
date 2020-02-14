@@ -1,5 +1,4 @@
 /* file      : tests/basic/driver.c
- * copyright : Copyright (c) 2009-2019 Code Synthesis Tools CC
  * license   : cURL License; see accompanying COPYING file
  */
 #include <stdio.h>
@@ -27,6 +26,7 @@ main (int argc, char* argv[])
   if (curl != NULL)
   {
     curl_easy_setopt (curl, CURLOPT_URL, url);
+    curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1L);
 
     CURLcode cr = curl_easy_perform (curl);
 
@@ -37,7 +37,7 @@ main (int argc, char* argv[])
 
       if (cr == CURLE_OK)
       {
-        if (status < 400)
+        if (status == 200)
           r = 0;
         else
           fprintf (stderr, "HTTP error: status code %ld\n", status);

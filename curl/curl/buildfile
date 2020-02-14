@@ -1,5 +1,4 @@
 # file      : curl/buildfile
-# copyright : Copyright (c) 2018-2019 Code Synthesis Ltd
 # license   : cURL License; see accompanying COPYING file
 
 import libs  = libcurl%lib{curl}
