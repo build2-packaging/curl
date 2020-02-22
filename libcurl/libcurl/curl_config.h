@@ -206,7 +206,6 @@
  */
 #else
 #  define HAVE_PROCESS_H           1
-#  define HAVE_STRUCT_POLLFD       1
 #  define USE_WIN32_CRYPTO         1
 #  define HAVE_CLOSESOCKET         1
 #  define HAVE_IOCTLSOCKET_FIONBIO 1
@@ -325,6 +324,7 @@
 #undef HAVE_BROTLI
 #undef EGD_SOCKET
 #undef DEBUGBUILD
+#undef HAVE_STRUCT_POLLFD
 #undef HAVE_DECL_GETPWUID_R_MISSING
 #undef HAVE_GETPASS_R
 #undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS
