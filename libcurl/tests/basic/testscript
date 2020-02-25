@@ -3,7 +3,7 @@
 
 : http
 :
-$* 'http://www.example.com' >>~%EOO%
+$* --verbose 'http://www.example.com' >>~%EOO% 2>!
   %.+
   EOO
 
