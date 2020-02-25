@@ -1,0 +1,5 @@
+: 1
+name: curl
+version: 7.67.0+8
+summary: Command line tool for transferring data with URLs
+license: cURL; MIT/X derivate license.
