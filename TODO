@@ -11,8 +11,6 @@ On the revision:
 
 - Replace the C++ comments with C comments in tests.
 
-- Disable the success build emails.
-
 On the release:
 
 - Use legal{} target type for legal documentation (LICENSE, AUTHORS, etc).

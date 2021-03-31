@@ -12,7 +12,7 @@ src-url: https://git.build2.org/cgit/packaging/curl/curl/tree/libcurl/
 package-url: https://git.build2.org/cgit/packaging/curl/
 email: curl-library@cool.haxx.se    ; Mailing list.
 package-email: packaging@build2.org ; Mailing list.
-build-email: builds@build2.org
+build-warning-email: builds@build2.org
 builds: all
 depends: * build2 >= 0.12.0
 depends: * bpkg >= 0.12.0
