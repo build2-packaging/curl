@@ -96,7 +96,11 @@ switch $tclass, $tsys
   case 'macos'
   {
     c.loptions += "-Wl,-exported_symbols_list,$src_base/libcurl-symbols.expsym"
-    c.libs     += -framework CoreFoundation -framework Security
+
+# @@ TMP Until erroneous -framework option suppression is fixed in build2.
+#
+#    c.libs     += -framework CoreFoundation -framework Security
+    c.libs     += -Wl,-framework,CoreFoundation -Wl,-framework,Security
   }
   case 'windows', 'mingw32'
   {
