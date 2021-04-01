@@ -1,12 +1,12 @@
 : 1
 name: curl
-version: 7.67.0+8
+version: 7.76.0-a.0.z
 summary: Command line tool for transferring data with URLs
 license: cURL ; MIT/X derivate license.
 topics: HTTP, FTP, URL, data transfer
 description-file: README
-url: https://curl.haxx.se/
-doc-url: https://curl.haxx.se/docs/manpage.html
+url: https://curl.se/
+doc-url: https://curl.se/docs/manpage.html
 src-url: https://git.build2.org/cgit/packaging/curl/curl/tree/curl/
 package-url: https://git.build2.org/cgit/packaging/curl/
 email: curl-users@cool.haxx.se       ; Mailing list.
@@ -16,4 +16,4 @@ builds: all
 depends: * build2 >= 0.12.0
 depends: * bpkg >= 0.12.0
 depends: libcurl == $
-depends: libca-certificates-curl >= 1.0.0
+depends: libca-certificates-curl ^1.0.0

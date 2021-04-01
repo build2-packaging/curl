@@ -78,7 +78,7 @@ switch $c.class, $tsys
   {
     # Disable warnings that pop up with /W3.
     #
-    c.coptions += /wd4996
+    c.coptions += /wd4028 /wd4996
   }
 }
 

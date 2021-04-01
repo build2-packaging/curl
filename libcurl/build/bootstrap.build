@@ -14,7 +14,7 @@ using dist
 # changes are made, the minor version when new features are added, and the
 # patch version is increased for bug fixes. See also:
 #
-# https://curl.haxx.se/docs/versions.html
+# https://curl.se/docs/versions.html
 #
 # The ABI version doesn't correlate with the release version and is assigned
 # via the libtool's -version-info <current>:<revision>:<age> option
@@ -22,13 +22,12 @@ using dist
 # makefile, the major version (current - age) is incremented for backwards-
 # incompatible ABI changes. See also:
 #
-# https://curl.haxx.se/libcurl/abi.html
+# https://curl.se/libcurl/abi.html
 #
-if ($version.major == 7 && $version.minor == 67 && $version.patch == 0)
+if ($version.major == 7 && $version.minor == 76 && $version.patch == 0)
 {
-
   abi_version_major = 4
-  abi_version = "$abi_version_major.6.0" # <current - age>.<age>.<revision>
+  abi_version = "$abi_version_major.7.0" # <current - age>.<age>.<revision>
 }
 else
   fail 'increment the ABI version?'

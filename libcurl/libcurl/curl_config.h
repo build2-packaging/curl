@@ -15,10 +15,12 @@
  */
 
 /* These macros are defined via the -D preprocessor option. Keep them listed
- * (in this exact form) for the change tracking (see ../README-DEV).
+ * (in this exact form) for the change tracking.
 
 #define OS
 #define VERSION
+#define BUILDING_LIBCURL
+#define CURL_STATICLIB
 
   */
 
@@ -78,6 +80,10 @@
 #undef CURL_DISABLE_TELNET
 #undef CURL_DISABLE_TFTP
 #undef CURL_DISABLE_VERBOSE_STRINGS
+#undef CURL_DISABLE_ALTSVC
+#undef CURL_DISABLE_GETOPTIONS
+#undef CURL_DISABLE_MQTT
+#undef CURL_DISABLE_SOCKETPAIR
 
 /* Diabled features.
  */
@@ -88,16 +94,13 @@
 #undef HAVE_LDAP_SSL
 #undef HAVE_LDAP_SSL_H
 #undef HAVE_LDAP_URL_PARSE
-
 #undef USE_LIBSSH
 #undef USE_LIBSSH2
 #undef HAVE_LIBSSH2_H
 #undef HAVE_LIBSSH_LIBSSH_H
 #undef USE_AMISSL
 #undef USE_GNUTLS
-#undef USE_GNUTLS_NETTLE
 #undef USE_ARES
-#undef USE_ESNI
 #undef USE_LIBPSL
 #undef USE_MANUAL
 #undef USE_MBEDTLS
@@ -108,9 +111,14 @@
 #undef USE_NGTCP2
 #undef USE_NSS
 #undef USE_OPENLDAP
-#undef USE_ALTSVC
 #undef USE_LIBRTMP
 #undef USE_QUICHE
+#undef USE_BEARSSL
+#undef USE_GSASL
+#undef USE_HSTS
+#undef USE_HYPER
+#undef USE_RUSTLS
+#undef USE_WOLFSSH
 
 /* Specific for (non-) Linux.
  */
@@ -157,6 +165,8 @@
 /* Specific for POSIX.
  */
 #ifndef _WIN32
+#  define USE_UNIX_SOCKETS       1
+
 #  define HAVE_ARPA_INET_H       1
 #  define HAVE_IFADDRS_H         1
 #  define HAVE_NETDB_H           1
@@ -191,13 +201,14 @@
 #  define HAVE_SYS_WAIT_H        1
 #  define HAVE_TERMIOS_H         1
 #  define HAVE_UTIMES            1
-#  define NTLM_WB_ENABLED        1
-#  define USE_UNIX_SOCKETS       1
+#  define HAVE_SUSECONDS_T       1
 
 #  define CURL_SA_FAMILY_T      sa_family_t
 #  define GETHOSTNAME_TYPE_ARG2 size_t
 
+#  define NTLM_WB_ENABLED        1
 #  define NTLM_WB_FILE          "/usr/bin/ntlm_auth"
+
 #  define RANDOM_FILE           "/dev/urandom"
 
 #  define CURL_EXTERN_SYMBOL    __attribute__ ((__visibility__ ("default")))
@@ -205,8 +216,14 @@
 /* Specific for Windows.
  */
 #else
-#  define HAVE_PROCESS_H           1
 #  define USE_WIN32_CRYPTO         1
+#  define USE_WIN32_IDN            1
+#  define USE_WIN32_LARGE_FILES    1
+#  define USE_WINDOWS_SSPI         1
+
+#  define WANT_IDN_PROTOTYPES      1
+
+#  define HAVE_PROCESS_H           1
 #  define HAVE_CLOSESOCKET         1
 #  define HAVE_IOCTLSOCKET_FIONBIO 1
 #  define HAVE_IO_H                1
@@ -214,10 +231,9 @@
 #  define HAVE_WINDOWS_H           1
 #  define HAVE_WINSOCK2_H          1
 #  define HAVE_WINSOCK_H           1
-#  define USE_WIN32_IDN            1
-#  define USE_WIN32_LARGE_FILES    1
-#  define USE_WINDOWS_SSPI         1
-#  define WANT_IDN_PROTOTYPES      1
+
+#  undef _UNICODE
+#  undef UNICODE
 
 #  undef SOCKET
 #  undef USE_LWIPSOCK
@@ -233,6 +249,7 @@
 #  undef CURL_SA_FAMILY_T
 #  undef GETHOSTNAME_TYPE_ARG2
 #  undef USE_WINSOCK
+#  undef WIN32_LEAN_AND_MEAN
 
 /* Unused on Windows (see include/curl/curl.h for details).
  */
@@ -251,6 +268,9 @@
 /* Specific for (non-) VC.
  */
 #ifndef _MSC_VER
+#  define USE_THREADS_POSIX            1
+#  undef  USE_THREADS_WIN32
+
 #  define HAVE_BASENAME                1
 #  define HAVE_CLOCK_GETTIME_MONOTONIC 1
 #  define HAVE_INET_NTOP               1
@@ -268,13 +288,15 @@
 #  define HAVE_UNISTD_H                1
 #  define HAVE_UTIME_H                 1
 #  define HAVE_VARIADIC_MACROS_GCC     1
+#  define HAVE_OPENSSL_SRP             1
+#  define HAVE_FTRUNCATE               1
+
 #  define TIME_WITH_SYS_TIME           1
-#  define USE_THREADS_POSIX            1
-#  undef  USE_THREADS_WIN32
 #else
-#  define NEED_MALLOC_H     1
 #  define USE_THREADS_WIN32 1
 #  undef  USE_THREADS_POSIX
+
+#  define NEED_MALLOC_H     1
 #endif
 
 /* Common for all supported OSes/compilers.
@@ -291,7 +313,6 @@
 #define HAVE_GETADDRINFO                1
 #define HAVE_FREEADDRINFO               1
 #define HAVE_GETADDRINFO_THREADSAFE     1
-#define HAVE_FTRUNCATE                  1
 #define HAVE_GETHOSTBYNAME              1
 #define HAVE_GETHOSTNAME                1
 #define HAVE_GETPEERNAME                1
@@ -311,10 +332,13 @@
 #define HAVE_TIME_H                     1
 #define HAVE_UTIME                      1
 #define HAVE_VARIADIC_MACROS_C99        1
+
 #define STDC_HEADERS                    1
 
 #undef _ALL_SOURCE
 #undef _LARGE_FILES
+#undef _FILE_OFFSET_BITS
+
 #undef HAVE_LBER_H
 #undef HAVE_NETINET_IN6_H
 #undef HAVE_GSSAPI_GSSAPI_GENERIC_H
@@ -322,14 +346,9 @@
 #undef HAVE_IDN2_H
 #undef HAVE_LIBIDN2
 #undef HAVE_BROTLI
-#undef EGD_SOCKET
-#undef DEBUGBUILD
 #undef HAVE_STRUCT_POLLFD
 #undef HAVE_DECL_GETPWUID_R_MISSING
 #undef HAVE_GETPASS_R
-#undef HAVE_GNUTLS_ALPN_SET_PROTOCOLS
-#undef HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2
-#undef HAVE_GNUTLS_OCSP_REQ_INIT
 #undef HAVE_GSSAPI
 #undef HAVE_GSSGNU
 #undef HAVE_IOCTLSOCKET_CAMEL_FIONBIO
@@ -348,11 +367,20 @@
 #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE
 #undef HAVE_WOLFSSL_USEALPN
 #undef HAVE_WRITABLE_ARGV
-#undef NEED_MEMORY_H
-#undef NEED_REENTRANT
-#undef NEED_THREAD_SAFE
+#undef HAVE_CLOSESOCKET_CAMEL
+#undef HAVE_GLIBC_STRERROR_R
+#undef HAVE_GNUTLS_SRP
+#undef HAVE_QUICHE_CONN_SET_QLOG_FD
+#undef HAVE_WOLFSSL_DES_ECB_ENCRYPT
+#undef HAVE_ZSTD
+#undef HAVE_CLOSE_S
+#undef HAVE_EXTRA_STRDUP_H
+#undef HAVE_EXTRA_STRICMP_H
+#undef HAVE_LIBSSH2_VERSION
+#undef HAVE_SSL_GET_SHUTDOWN
+#undef HAVE_VXWORKS_STRERROR_R
+#undef RECVFROM_TYPE_ARG6_IS_VOID
 
-#undef CURLDEBUG
 #undef HAVE_GETNAMEINFO
 #undef GETNAMEINFO_QUAL_ARG1
 #undef GETNAMEINFO_TYPE_ARG1
@@ -368,6 +396,24 @@
 #undef RECVFROM_TYPE_ARG5
 #undef RECVFROM_TYPE_ARG6
 #undef RECVFROM_TYPE_RETV
+
+#undef HAVE_ICONV
+#undef CURL_ICONV_CODESET_OF_HOST
+
+#undef NEED_MEMORY_H
+#undef NEED_REENTRANT
+#undef NEED_THREAD_SAFE
+
+#undef USE_GSKIT
+#undef USE_OS400CRYPTO
+
+#undef BSD
+#undef EGD_SOCKET
+#undef CURLDEBUG
+#undef DEBUGBUILD
+#undef ENABLE_QUIC
+#undef OPEN_NEEDS_ARG3
+#undef CURL_DOES_CONVERSIONS
 
 /* While upstream defines the macro for Clang, it fails to build for older
  * version of Clang on Mac OS. Thus, we never define it.
@@ -458,13 +504,23 @@
 #define RETSIGTYPE     void
 #define SEND_QUAL_ARG2 const
 
-/* We can probably assume that on platforms we build for, these keywords/types
- * doesn't require definition.
+/* We can probably assume that on platforms we build for, these keywords,
+ * types, and macros do not require definition.
 
 #undef const
 #undef inline
 #undef size_t
 #undef ssize_t
+
+#undef EAGAIN
+#undef ENOMEM
+#undef ENOSPC
+
+#undef F_OK
+#undef O_RDONLY
+
+#undef LONG_MAX
+#undef LONG_MIN
 
 */
 
