@@ -5,7 +5,7 @@
 #include <curl_config.h>
 
 #ifdef _MSC_VER
-#  include <windows.h> // C_ASSERT()
+#  include <windows.h> /* C_ASSERT() */
 #endif
 
 #include <time.h>

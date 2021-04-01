@@ -53,7 +53,7 @@ main (int argc, char* argv[])
       fprintf (stderr, "calling curl_easy_setopt()\n");
 
     curl_easy_setopt (curl, CURLOPT_URL, url);
-    curl_easy_setopt (curl, CURLOPT_TIMEOUT, 600L);      // 10 mins.
+    curl_easy_setopt (curl, CURLOPT_TIMEOUT, 600L);      /* 10 mins. */
     curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1L);
 
     char agent[] = "libcurl-test/" LIBCURL_VERSION;

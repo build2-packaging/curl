@@ -7,7 +7,11 @@ location: ../../openssl/openssl.git##HEAD
 
 :
 role: prerequisite
-location: ../ca-certificates-curl.git##HEAD
+
+# @@ TMP Until ca-certificates-curl is merged to master.
+#
+#location: ../ca-certificates-curl.git##HEAD
+location: ../ca-certificates-curl.git#1.0.1
 
 :
 role: prerequisite

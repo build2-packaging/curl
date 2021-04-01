@@ -1,8 +1,8 @@
 cURL is a client-side software for transferring data using URLs with the
-libcurl C library providing the data transfer and URL manipulation APIs.
-For more information see:
+libcurl C library providing the data transfer and URL manipulation APIs. For
+more information see:
 
-https://curl.haxx.se/
+https://curl.se/
 
 This package contains the original libcurl library source code overlaid with
 the build2-based build system and packaged for the build2 package manager
