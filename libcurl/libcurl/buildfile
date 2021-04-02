@@ -25,8 +25,8 @@ bsd     = ($tclass == 'bsd')
 macos   = ($tclass == 'macos')
 windows = ($tclass == 'windows')
 
-libs{curl}: vsc{libcurl}:         include = ($linux || $bsd ? adhoc : false)
-libs{curl}: esm{libcurl-symbols}: include = ($macos         ? adhoc : false)
+libs{curl}: vsc{libcurl}: include = ($linux || $bsd ? adhoc : false)
+libs{curl}: esm{libcurl}: include = ($macos         ? adhoc : false)
 
 vsc{libcurl}: lib/in{libcurl}
 {
@@ -34,6 +34,34 @@ vsc{libcurl}: lib/in{libcurl}
 
   CURL_LT_SHLIB_VERSIONED_FLAVOUR = 'OPENSSL_'
 }
+
+# Generate the exported symbol list file using the interface headers.
+#
+# Note that upstream auto-generate this file (named as libcurl-symbols.expsym)
+# by using the nm utility, dumping symbols from object files and processing
+# the output. This, in particular, results in the _curl_jmpenv symbol which
+# causes 'cannot export hidden symbol' linker warning.
+#
+esm{libcurl}: include/curl/h{** -stdcheaders -typecheck-gcc}
+{{
+  diag sed $> # @@ TMP
+
+  # Examples of the function declarations we need to match:
+  #
+  # CURL_EXTERN CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen,
+  #                                     size_t *n);
+  #
+  # CURL_EXTERN const struct curl_easyoption *
+  # curl_easy_option_by_id (CURLoption id);
+  #
+  # Note that we need to avoid matching the function calls in macro expansions
+  # and mentioning functions in comments. Thus, we disallow the leading
+  # spaces, unless the leading CURL_EXTERN specifier is also present in the
+  # line.
+  #
+  cat $path($<) | \
+  sed -n -e 's/^(\s*CURL_EXTERN\b.+\b)?(curl_\w+)\s*\(.*/_\2/p' >$path($>)
+}}
 
 # Build options.
 #
@@ -95,7 +123,7 @@ switch $tclass, $tsys
   }
   case 'macos'
   {
-    c.loptions += "-Wl,-exported_symbols_list,$src_base/libcurl-symbols.expsym"
+    c.loptions += "-Wl,-exported_symbols_list,$out_base/libcurl.expsym"
 
 # @@ TMP Until erroneous -framework option suppression is fixed in build2.
 #

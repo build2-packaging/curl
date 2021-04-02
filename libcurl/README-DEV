@@ -13,10 +13,6 @@ Some macro values cannot be easily determined at the preprocessing time. We
 define them based on the supported platform tests and add libcurl/assert.c,
 containing compile-time assertions for the macros in question.
 
-Copy the upstream's libtool-generated for MacOS libcurl-symbols.expsym file
-and comment out (with #) the _curl_jmpenv symbol in it since it causes the
-'cannot export hidden symbol' linked warning on MacOS.
-
 Note that re-creating libcurl/curl_config.h from scratch every time we upgrade
 to a new upstream version would be a real pain. Instead we can only (un)define
 the newly introduced macros, comparing the already defined and currently used
