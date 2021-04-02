@@ -1,10 +1,5 @@
 On the revision:
 
-- Fix the switch statements in the buildfiles, replacing 'switch $c.class,
-  $tsys' with 'switch $c.class'.
-
-- Replace the C++ comments with C comments in tests.
-
 On the release:
 
 - Use legal{} target type for legal documentation (LICENSE, AUTHORS, etc).
