@@ -1,7 +1,5 @@
 On the revision:
 
-- Make the .vers and .expsym files prerequisites of the libs type target.
-
 - Canonicalize the license in the package manifests.
 
 - Fix the switch statements in the buildfiles, replacing 'switch $c.class,
