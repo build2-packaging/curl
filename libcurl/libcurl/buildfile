@@ -6,11 +6,6 @@
 define vsc: file
 vsc{*}: extension = vers
 
-# Exported symbols.
-#
-define esm: file
-esm{*}: extension = expsym
-
 import imp_libs  = libssl%lib{ssl}
 import imp_libs += libcrypto%lib{crypto}
 import imp_libs += libz%lib{z}
@@ -25,8 +20,7 @@ bsd     = ($tclass == 'bsd')
 macos   = ($tclass == 'macos')
 windows = ($tclass == 'windows')
 
-libs{curl}: vsc{libcurl}:         include = ($linux || $bsd ? adhoc : false)
-libs{curl}: esm{libcurl-symbols}: include = ($macos         ? adhoc : false)
+libs{curl}: vsc{libcurl}: include = ($linux || $bsd ? adhoc : false)
 
 vsc{libcurl}: lib/in{libcurl}
 {
@@ -95,8 +89,13 @@ switch $tclass, $tsys
   }
   case 'macos'
   {
-    c.loptions += "-Wl,-exported_symbols_list,$src_base/libcurl-symbols.expsym"
-    c.libs     += -framework CoreFoundation -framework Security
+    # Note that upstream generates the libcurl-symbols.expsym file on MacOS
+    # and passes it to linker via the -exported_symbols_list option. This
+    # looks redundant, since the __visibility__("default") attribute is also
+    # used for the API function declarations. Thus, we don't bother
+    # generating/passing the exported symbol list file.
+    #
+    c.libs += -framework CoreFoundation -framework Security
   }
   case 'windows', 'mingw32'
   {
