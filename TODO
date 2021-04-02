@@ -1,7 +1,5 @@
 On the revision:
 
-- Load the c.config module rather than c in curl/tests/build/root.build.
-
 - Make the .vers and .expsym files prerequisites of the libs type target.
 
 - Canonicalize the license in the package manifests.
