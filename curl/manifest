@@ -2,7 +2,7 @@
 name: curl
 version: 7.76.0-a.0.z
 summary: Command line tool for transferring data with URLs
-license: cURL ; MIT/X derivate license.
+license: curl ; MIT/X derivate license.
 topics: HTTP, FTP, URL, data transfer
 description-file: README
 url: https://curl.se/

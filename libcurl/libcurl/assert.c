@@ -1,5 +1,5 @@
 /* file      : libcurl/assert.c -*- C -*-
- * license   : cURL License; see accompanying COPYING file
+ * license   : curl License; see accompanying COPYING file
  */
 
 #include <curl_config.h>

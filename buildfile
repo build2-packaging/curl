@@ -1,5 +1,5 @@
 # file      : buildfile
-# license   : cURL License; see accompanying COPYING file
+# license   : curl License; see accompanying COPYING file
 
 # Glue buildfile that "pulls" all the packages.
 
