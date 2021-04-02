@@ -25,8 +25,8 @@ bsd     = ($tclass == 'bsd')
 macos   = ($tclass == 'macos')
 windows = ($tclass == 'windows')
 
-lib{curl}: vsc{libcurl}:         include = ($linux || $bsd ? adhoc : false)
-lib{curl}: esm{libcurl-symbols}: include = ($macos         ? adhoc : false)
+libs{curl}: vsc{libcurl}:         include = ($linux || $bsd ? adhoc : false)
+libs{curl}: esm{libcurl-symbols}: include = ($macos         ? adhoc : false)
 
 vsc{libcurl}: lib/in{libcurl}
 {
