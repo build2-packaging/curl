@@ -28,7 +28,7 @@ switch $tclass, $tsys
 
 c.poptions =+ "-I$src_base" "-I$src_base/src" "-I$src_base/lib"
 
-switch $c.class, $tsys
+switch $c.class
 {
   case 'gcc'
   {

@@ -63,7 +63,7 @@ obja{*}: c.poptions += -DCURL_STATICLIB
 if! $windows
   c.coptions += -fvisibility=hidden
 
-switch $c.class, $tsys
+switch $c.class
 {
   case 'gcc'
   {
