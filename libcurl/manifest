@@ -14,8 +14,8 @@ email: curl-library@cool.haxx.se    ; Mailing list.
 package-email: packaging@build2.org ; Mailing list.
 build-warning-email: builds@build2.org
 builds: all
-depends: * build2 >= 0.12.0
-depends: * bpkg >= 0.12.0
+depends: * build2 >= 0.13.0
+depends: * bpkg >= 0.13.0
 depends: libz ^1.2.1100
 depends: libcrypto ^1.1.1
 depends: libssl ^1.1.1
