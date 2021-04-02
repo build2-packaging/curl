@@ -1,5 +1,5 @@
 /* file      : tests/basic/driver.c
- * license   : cURL License; see accompanying COPYING file
+ * license   : curl License; see accompanying COPYING file
  */
 #include <stdio.h>
 #include <assert.h>

@@ -1,5 +1,5 @@
 # file      : build/root.build
-# license   : cURL License; see accompanying COPYING file
+# license   : curl License; see accompanying COPYING file
 
 $out_root/
 {

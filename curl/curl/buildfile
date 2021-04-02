@@ -1,5 +1,5 @@
 # file      : curl/buildfile
-# license   : cURL License; see accompanying COPYING file
+# license   : curl License; see accompanying COPYING file
 
 import libs  = libcurl%lib{curl}
 import libs += libca-certificates-curl%lib{ca-certificates-curl}

@@ -1,5 +1,5 @@
 # file      : tests/build/bootstrap.build
-# license   : cURL License; see accompanying COPYING file
+# license   : curl License; see accompanying COPYING file
 
 project = # Unnamed subproject.
 

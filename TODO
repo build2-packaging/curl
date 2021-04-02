@@ -1,7 +1,5 @@
 On the revision:
 
-- Canonicalize the license in the package manifests.
-
 - Fix the switch statements in the buildfiles, replacing 'switch $c.class,
   $tsys' with 'switch $c.class'.
 

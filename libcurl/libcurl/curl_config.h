@@ -1,5 +1,5 @@
 /* file      : libcurl/curl_config.h -*- C -*-
- * license   : cURL License; see accompanying COPYING file
+ * license   : curl License; see accompanying COPYING file
  */
 
 #ifndef LIBCURL_CURL_CONFIG_H

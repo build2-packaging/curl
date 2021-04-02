@@ -1,4 +1,4 @@
 # file      : tests/buildfile
-# license   : cURL License; see accompanying COPYING file
+# license   : curl License; see accompanying COPYING file
 
 ./: {*/ -build/}
