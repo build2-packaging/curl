@@ -1,0 +1,6 @@
+: 1
+name: libcurl
+version: 7.76.0
+project: curl
+summary: C library for transferring data with URLs
+license: curl; MIT/X derivate license.
