@@ -84,6 +84,9 @@
 #undef CURL_DISABLE_GETOPTIONS
 #undef CURL_DISABLE_MQTT
 #undef CURL_DISABLE_SOCKETPAIR
+#undef CURL_DISABLE_HEADERS_API
+#undef CURL_DISABLE_HSTS
+#undef CURL_DISABLE_NTLM
 
 /* Diabled features.
  */
@@ -104,8 +107,6 @@
 #undef USE_LIBPSL
 #undef USE_MANUAL
 #undef USE_MBEDTLS
-#undef USE_MESALINK
-#undef USE_METALINK
 #undef USE_NGHTTP2
 #undef USE_NGHTTP3
 #undef USE_NGTCP2
@@ -115,10 +116,10 @@
 #undef USE_QUICHE
 #undef USE_BEARSSL
 #undef USE_GSASL
-#undef USE_HSTS
 #undef USE_HYPER
 #undef USE_RUSTLS
 #undef USE_WOLFSSH
+#undef USE_MSH3
 
 /* Specific for (non-) Linux.
  */
@@ -202,6 +203,9 @@
 #  define HAVE_TERMIOS_H         1
 #  define HAVE_UTIMES            1
 #  define HAVE_SUSECONDS_T       1
+#  define HAVE_FCHMOD            1
+#  define HAVE_NETINET_UDP_H     1
+#  define HAVE_SENDMSG           1
 
 #  define CURL_SA_FAMILY_T      sa_family_t
 #  define GETHOSTNAME_TYPE_ARG2 size_t
@@ -230,7 +234,6 @@
 #  define HAVE_SYS_UTIME_H         1
 #  define HAVE_WINDOWS_H           1
 #  define HAVE_WINSOCK2_H          1
-#  define HAVE_WINSOCK_H           1
 
 #  undef _UNICODE
 #  undef UNICODE
@@ -290,6 +293,7 @@
 #  define HAVE_VARIADIC_MACROS_GCC     1
 #  define HAVE_OPENSSL_SRP             1
 #  define HAVE_FTRUNCATE               1
+#  define HAVE_SCHED_YIELD             1
 
 #  define TIME_WITH_SYS_TIME           1
 #else
@@ -318,10 +322,8 @@
 #define HAVE_GETPEERNAME                1
 #define HAVE_GETSOCKNAME                1
 #define HAVE_LONGLONG                   1
-#define HAVE_OPENSSL_VERSION            1
 #define HAVE_SOCKET                     1
 #define HAVE_SELECT                     1
-#define HAVE_SIG_ATOMIC_T               1
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 #define HAVE_STRDUP                     1
 #define HAVE_STRTOLL                    1
@@ -332,8 +334,25 @@
 #define HAVE_TIME_H                     1
 #define HAVE_UTIME                      1
 #define HAVE_VARIADIC_MACROS_C99        1
+#define HAVE_STRICMP                    1
 
-#define STDC_HEADERS                    1
+/* <stdatomic.h>, _Atomic, atomic_*, etc
+ *
+ * @@ TMP Note that upstream's package version 7.84.0 fails to compile with
+ *        older versions of Clang with the 'unknown builtin' error (trying to
+ *        use __builtin_ia32_pause()). At the time of this writing this issue
+ *        is fixed but the fixed version is not released yet. When it is
+ *        released, drop the check and define HAVE_ATOMIC
+ *        unconditionally. Until then the curl_global_*() functions will be
+ *        thread-unsafe for Clang versions prior to 6.0 (as they are for
+ *        libcurl versions prior to 7.84.0).
+ */
+#if !defined(__STDC_NO_ATOMICS__) && \
+    (!defined(__clang__) || __clang_major__ >= 6)
+#  define HAVE_ATOMIC 1
+#endif
+
+#define STDC_HEADERS 1
 
 #undef _ALL_SOURCE
 #undef _LARGE_FILES
@@ -357,13 +376,10 @@
 #undef HAVE_PROTO_BSDSOCKET_H
 #undef HAVE_RAND_EGD
 #undef HAVE_SETSOCKOPT_SO_NONBLOCK
-#undef HAVE_SIG_ATOMIC_T_VOLATILE
-#undef HAVE_SSLV2_CLIENT_METHOD
 #undef HAVE_STRCMPI
 #undef HAVE_STROPTS_H
 #undef HAVE_TERMIO_H
 #undef HAVE_TIME_T_UNSIGNED
-#undef HAVE_WOLFSSLV3_CLIENT_METHOD
 #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE
 #undef HAVE_WOLFSSL_USEALPN
 #undef HAVE_WRITABLE_ARGV
@@ -376,17 +392,8 @@
 #undef HAVE_CLOSE_S
 #undef HAVE_EXTRA_STRDUP_H
 #undef HAVE_EXTRA_STRICMP_H
-#undef HAVE_LIBSSH2_VERSION
 #undef HAVE_SSL_GET_SHUTDOWN
-#undef HAVE_VXWORKS_STRERROR_R
 #undef RECVFROM_TYPE_ARG6_IS_VOID
-
-#undef HAVE_GETNAMEINFO
-#undef GETNAMEINFO_QUAL_ARG1
-#undef GETNAMEINFO_TYPE_ARG1
-#undef GETNAMEINFO_TYPE_ARG2
-#undef GETNAMEINFO_TYPE_ARG46
-#undef GETNAMEINFO_TYPE_ARG7
 
 #undef HAVE_RECVFROM
 #undef RECVFROM_TYPE_ARG1
@@ -396,9 +403,6 @@
 #undef RECVFROM_TYPE_ARG5
 #undef RECVFROM_TYPE_ARG6
 #undef RECVFROM_TYPE_RETV
-
-#undef HAVE_ICONV
-#undef CURL_ICONV_CODESET_OF_HOST
 
 #undef NEED_MEMORY_H
 #undef NEED_REENTRANT
@@ -412,8 +416,6 @@
 #undef CURLDEBUG
 #undef DEBUGBUILD
 #undef ENABLE_QUIC
-#undef OPEN_NEEDS_ARG3
-#undef CURL_DOES_CONVERSIONS
 
 /* While upstream defines the macro for Clang, it fails to build for older
  * version of Clang on Mac OS. Thus, we never define it.
@@ -501,7 +503,6 @@
  */
 #define SIZEOF_CURL_OFF_T 8
 
-#define RETSIGTYPE     void
 #define SEND_QUAL_ARG2 const
 
 /* We can probably assume that on platforms we build for, these keywords,
@@ -522,6 +523,6 @@
 #undef LONG_MAX
 #undef LONG_MIN
 
-*/
+ */
 
 #endif /* LIBCURL_CURL_CONFIG_H */

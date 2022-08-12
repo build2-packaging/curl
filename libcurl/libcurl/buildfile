@@ -29,6 +29,40 @@ vsc{libcurl}: lib/in{libcurl}
   CURL_LT_SHLIB_VERSIONED_FLAVOUR = 'OPENSSL_'
 }
 
+# It seems that for earlier versions of clang the __has_include_next() macro
+# is broken in the -frewrite-includes mode. So, in particular, the following
+# fragment of llvm-6.0's stdatomic.h:
+#
+#  #if __STDC_HOSTED__ && __has_include_next(<stdatomic.h>)
+#  # include_next <stdatomic.h>
+#  #else
+#  ...
+#  typedef _Atomic(_Bool)              atomic_bool;
+#  ...
+#  #endif
+#
+#  expands into:
+#
+#  #if __STDC_HOSTED__ && (1)/*__has_include_next(<stdatomic.h>)*/
+#  #if 0 /* expanded by -frewrite-includes */
+#  # include_next <stdatomic.h>
+#  #endif /* expanded by -frewrite-includes */
+#  # 31 "/usr/lib/llvm-6.0/lib/clang/6.0.0/include/stdatomic.h" 3
+#  # 32 "/usr/lib/llvm-6.0/lib/clang/6.0.0/include/stdatomic.h" 3
+#  #else
+#  ...
+#  typedef _Atomic(_Bool)              atomic_bool;
+#  ...
+#  #endif
+#
+# This ends up with no atomic_* types defined, etc.
+#
+# Thus, we enable reprocessing for the source files which (indirectly) include
+# <stdatomic.h> for Clang versions prior to 7.0.
+#
+if ($c.id == 'clang' && $c.version.major < 7)
+  lib/obj{easy version}: cc.reprocess = true
+
 # Build options.
 #
 c.poptions += -DBUILDING_LIBCURL -DHAVE_CONFIG_H \
@@ -95,7 +129,9 @@ switch $tclass, $tsys
     # used for the API function declarations. Thus, we don't bother
     # generating/passing the exported symbol list file.
     #
-    c.libs += -framework CoreFoundation -framework Security
+    c.libs += -framework CoreFoundation      \
+              -framework SystemConfiguration \
+              -framework Security
   }
   case 'windows', 'mingw32'
   {

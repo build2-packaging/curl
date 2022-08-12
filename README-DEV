@@ -28,14 +28,11 @@ Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. These files
 can be obtained as follows:
 
-$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.74.0-1.1.debian.tar.xz
-$ tar xf curl_7.74.0-1.1.debian.tar.xz debian/rules
+$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.84.0-2.debian.tar.xz
+$ tar xf curl_7.84.0-2.debian.tar.xz debian/rules
 
-Note that at the time of upgrade curl 7.76.0 is not available for the Debian
-distribution, so we take the latest available version.
-
-$ wget https://kojipkgs.fedoraproject.org/packages/curl/7.76.0/1.fc35/src/curl-7.76.0-1.fc35.src.rpm
-$ rpm2cpio curl-7.76.0-1.fc35.src.rpm | cpio -civ '*.spec'
+$ wget https://kojipkgs.fedoraproject.org/packages/curl/7.84.0/2.fc37/src/curl-7.84.0-2.fc37.src.rpm
+$ rpm2cpio curl-7.84.0-2.fc37.src.rpm | cpio -civ '*.spec'
 
 As a side note, on Debian and Fedora the source, library, headers, and tools
 are packaged as follows:
@@ -55,6 +52,7 @@ Debian:
   --enable-threaded-resolver --with-lber-lib=lber
   --with-gssapi=/usr --with-libssh2 --with-nghttp2
   --with-zsh-functions-dir=/usr/share/zsh/vendor-completions
+  --with-openssl
   --with-ca-path=/etc/ssl/certs
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
@@ -64,30 +62,38 @@ Fedora:
   --enable-threaded-resolver --with-gssapi --with-nghttp2 --with-ssl
   --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt
   --enable-ldap --enable-ldaps --enable-manual --with-brotli --with-libidn2
-  --with-libmetalink --with-libpsl --with-libssh
+  --with-libpsl --with-libssh
+  --enable-hsts --without-zstd --enable-dict --enable-gopher --enable-imap
+  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
+  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
 
 The union of these feature sets translates into the following options:
 
   --enable-symbol-hiding --enable-versioned-symbols
   --enable-threaded-resolver --with-lber-lib=lber --with-gssapi --with-libssh2
   --with-nghttp2 --with-zsh-functions-dir=<path> --with-ca-path=<path>
-  --with-ca-bundle=<path> --enable-ipv6 --with-ssl --enable-ldap
+  --with-ca-bundle=<path> --enable-ipv6 --with-openssl --enable-ldap
   --enable-ldaps --enable-manual --with-brotli --with-libidn2
-  --with-libmetalink --with-libpsl --with-libssh
+  --with-libpsl --with-libssh
+  --enable-hsts --enable-dict --enable-gopher --enable-imap
+  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
+  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
 
 We, however, drop the external dependencies that are not packaged for build2,
 disable default CA bundle/directory and use --with-ca-fallback instead,
 explicitly request to use zlib and end up with the following options:
 
   --enable-symbol-hiding --enable-versioned-symbols --enable-threaded-resolve
-  --enable-ipv6 --with-ssl --with-zlib --disable-ldap --disable-ldaps
+  --enable-ipv6 --with-openssl --with-zlib --disable-ldap --disable-ldaps
   --disable-ares --disable-esni --disable-manual --without-lber-lib
   --without-gssapi --without-libssh --without-libssh2 --without-nghttp2
   --without-zsh-functions-dir --without-brotli --without-libidn2
-  --without-libmetalink --without-libpsl
-  --without-bearssl --without-libgsasl --disable-hsts --without-hyper
+  --without-libpsl --without-bearssl --without-libgsasl --without-hyper
   --without-rustls --without-wolfssh
   --without-ca-bundle --without-ca-path --with-ca-fallback
+  --enable-hsts --enable-dict --enable-gopher --enable-imap
+  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
+  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
 
 See the configuration options description at the "Install from source" page
 (https://curl.se/docs/install.html).
@@ -134,14 +140,18 @@ $ autoreconf -fi
 $ mkdir build
 $ cd build
 $ ../configure --enable-symbol-hiding --enable-versioned-symbols \
-  --enable-threaded-resolve --enable-ipv6 --with-ssl --with-zlib \
+  --enable-threaded-resolve --enable-ipv6 --with-openssl --with-zlib \
   --disable-ldap --disable-ldaps --disable-ares --disable-esni \
   --disable-manual --without-lber-lib --without-gssapi --without-libssh \
   --without-libssh2 --without-nghttp2 --without-zsh-functions-dir \
-  --without-brotli --without-libidn2 --without-libmetalink --without-libpsl \
-  --without-bearssl --without-libgsasl --disable-hsts --without-hyper \
+  --without-brotli --without-libidn2 --without-libpsl \
+  --without-bearssl --without-libgsasl --without-hyper \
   --without-rustls --without-wolfssh \
-  --without-ca-bundle --without-ca-path --with-ca-fallback >build.log 2>&1
+  --without-ca-bundle --without-ca-path --with-ca-fallback \
+  --enable-hsts --enable-dict --enable-gopher --enable-imap \
+  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp \
+  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp \
+  >build.log 2>&1
 $ make V=1 >>build.log 2>&1
 
 For MSVC:
