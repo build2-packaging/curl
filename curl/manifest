@@ -14,6 +14,7 @@ email: curl-users@lists.haxx.se      ; Mailing list.
 package-email: packaging@build2.org  ; Mailing list.
 build-warning-email: builds@build2.org
 builds: all
+builds: -wasm
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
 depends: libcurl == $
