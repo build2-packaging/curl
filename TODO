@@ -4,3 +4,9 @@ On the release:
 
   Note that here we record items that require bumping build2 version
   requirement to the latest released version of the toolchain.
+
+Additional (permanent) notes:
+
+- Review '@@ TMP' notes.
+
+- Add/remove 'priority: security' manifest value, if required.
