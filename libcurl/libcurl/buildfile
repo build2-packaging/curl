@@ -71,15 +71,8 @@ c.poptions += -DBUILDING_LIBCURL -DHAVE_CONFIG_H \
 if! $windows
   c.poptions += -DCURL_HIDDEN_SYMBOLS
 
-# Note that the upstream package uses the -pthread compiler/linker option on
-# Linux and FreeBSD. The option is unsupported by build2 so we pass
-# -D_REENTRANT and -lpthread preprocessor/linker options instead.
-#
 switch $tclass, $tsys
 {
-  case 'linux' | 'bsd'
-    c.poptions += -D_REENTRANT
-
   case 'windows', 'win32-msvc'
     c.poptions += -DWIN32
 }
@@ -119,7 +112,7 @@ switch $tclass, $tsys
     c.loptions += -Wl,--no-undefined
 
     c.loptions += "-Wl,--version-script=$out_base/libcurl.vers"
-    c.libs     += -lpthread
+    c.libs     += -pthread
   }
   case 'macos'
   {

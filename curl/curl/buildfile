@@ -13,15 +13,8 @@ tsys   = $c.target.system
 #
 c.poptions += -DHAVE_CONFIG_H
 
-# Note that the upstream package uses the -pthread compiler/linker option on
-# Linux and FreeBSD. The option is unsupported by build2 so we pass
-# -D_REENTRANT and -lpthread preprocessor/linker options instead.
-#
 switch $tclass, $tsys
 {
-  case 'linux' | 'bsd'
-    c.poptions += -D_REENTRANT
-
   case 'windows', 'win32-msvc'
     c.poptions += -DWIN32
 }
@@ -50,7 +43,7 @@ switch $c.class
 switch $tclass, $tsys
 {
   case 'linux' | 'bsd'
-    c.libs += -lpthread
+    c.libs += -pthread
 
   case 'windows', 'mingw32'
     c.libs+= -lws2_32
