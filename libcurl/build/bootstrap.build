@@ -1,4 +1,4 @@
-# file      : build/root.build
+# file      : build/bootstrap.build
 # license   : curl License; see accompanying COPYING file
 
 project = libcurl
@@ -17,14 +17,14 @@ using dist
 # https://curl.se/docs/versions.html
 #
 # The ABI version doesn't correlate with the release version and is assigned
-# via the libtool's -version-info <current>:<revision>:<age> option
-# (VERSIONINFO in lib/Makefile.am). As it follows from the comment in the
+# via the libtool's -version-info <current>:<revision>:<age> option (VERSION*
+# variables in lib/Makefile.soname). As it follows from the comment in the
 # makefile, the major version (current - age) is incremented for backwards-
 # incompatible ABI changes. See also:
 #
 # https://curl.se/libcurl/abi.html
 #
-if ($version.major == 7 && $version.minor == 84 && $version.patch == 0)
+if ($version.major == 7 && $version.minor == 87 && $version.patch == 0)
 {
   abi_version_major = 4
   abi_version = "$abi_version_major.8.0" # <current - age>.<age>.<revision>

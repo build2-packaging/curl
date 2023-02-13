@@ -53,7 +53,6 @@
 /* Enabled features.
  */
 #define ENABLE_IPV6 1
-#define HAVE_ZLIB_H 1
 #define HAVE_LIBZ   1
 
 #undef CURL_DISABLE_COOKIES
@@ -99,8 +98,6 @@
 #undef HAVE_LDAP_URL_PARSE
 #undef USE_LIBSSH
 #undef USE_LIBSSH2
-#undef HAVE_LIBSSH2_H
-#undef HAVE_LIBSSH_LIBSSH_H
 #undef USE_AMISSL
 #undef USE_GNUTLS
 #undef USE_ARES
@@ -120,6 +117,7 @@
 #undef USE_RUSTLS
 #undef USE_WOLFSSH
 #undef USE_MSH3
+#undef USE_WEBSOCKETS
 
 /* Specific for (non-) Linux.
  */
@@ -177,6 +175,7 @@
 #  define HAVE_POLL_H            1
 #  define HAVE_PWD_H             1
 #  define HAVE_ALARM             1
+#  define HAVE_FCNTL             1
 #  define HAVE_FCNTL_O_NONBLOCK  1
 #  define HAVE_FNMATCH           1
 #  define HAVE_GETEUID           1
@@ -225,9 +224,6 @@
 #  define USE_WIN32_LARGE_FILES    1
 #  define USE_WINDOWS_SSPI         1
 
-#  define WANT_IDN_PROTOTYPES      1
-
-#  define HAVE_PROCESS_H           1
 #  define HAVE_CLOSESOCKET         1
 #  define HAVE_IOCTLSOCKET_FIONBIO 1
 #  define HAVE_IO_H                1
@@ -294,8 +290,6 @@
 #  define HAVE_OPENSSL_SRP             1
 #  define HAVE_FTRUNCATE               1
 #  define HAVE_SCHED_YIELD             1
-
-#  define TIME_WITH_SYS_TIME           1
 #else
 #  define USE_THREADS_WIN32 1
 #  undef  USE_THREADS_POSIX
@@ -305,10 +299,8 @@
 
 /* Common for all supported OSes/compilers.
  */
-#define HAVE_ASSERT_H                   1
 #define HAVE_STDBOOL_H                  1
 #define HAVE_BOOL_T                     1
-#define HAVE_ERRNO_H                    1
 #define HAVE_FCNTL_H                    1
 #define HAVE_WS2TCPIP_H                 1
 #define HAVE_SIGNAL_H                   1
@@ -317,7 +309,6 @@
 #define HAVE_GETADDRINFO                1
 #define HAVE_FREEADDRINFO               1
 #define HAVE_GETADDRINFO_THREADSAFE     1
-#define HAVE_GETHOSTBYNAME              1
 #define HAVE_GETHOSTNAME                1
 #define HAVE_GETPEERNAME                1
 #define HAVE_GETSOCKNAME                1
@@ -331,26 +322,12 @@
 #define HAVE_STRUCT_TIMEVAL             1
 #define HAVE_SYS_STAT_H                 1
 #define HAVE_SYS_TYPES_H                1
-#define HAVE_TIME_H                     1
 #define HAVE_UTIME                      1
 #define HAVE_VARIADIC_MACROS_C99        1
 #define HAVE_STRICMP                    1
-
-/* <stdatomic.h>, _Atomic, atomic_*, etc
- *
- * @@ TMP Note that upstream's package version 7.84.0 fails to compile with
- *        older versions of Clang with the 'unknown builtin' error (trying to
- *        use __builtin_ia32_pause()). At the time of this writing this issue
- *        is fixed but the fixed version is not released yet. When it is
- *        released, drop the check and define HAVE_ATOMIC
- *        unconditionally. Until then the curl_global_*() functions will be
- *        thread-unsafe for Clang versions prior to 6.0 (as they are for
- *        libcurl versions prior to 7.84.0).
- */
-#if !defined(__STDC_NO_ATOMICS__) && \
-    (!defined(__clang__) || __clang_major__ >= 6)
-#  define HAVE_ATOMIC 1
-#endif
+#define HAVE_SNPRINTF                   1
+#define HAVE_STDATOMIC_H                1
+#define HAVE_ATOMIC                     1
 
 #define STDC_HEADERS 1
 
@@ -365,7 +342,6 @@
 #undef HAVE_IDN2_H
 #undef HAVE_LIBIDN2
 #undef HAVE_BROTLI
-#undef HAVE_STRUCT_POLLFD
 #undef HAVE_DECL_GETPWUID_R_MISSING
 #undef HAVE_GETPASS_R
 #undef HAVE_GSSAPI
@@ -375,7 +351,6 @@
 #undef HAVE_PK11_CREATEMANAGEDGENERICOBJECT
 #undef HAVE_PROTO_BSDSOCKET_H
 #undef HAVE_RAND_EGD
-#undef HAVE_SETSOCKOPT_SO_NONBLOCK
 #undef HAVE_STRCMPI
 #undef HAVE_STROPTS_H
 #undef HAVE_TERMIO_H
@@ -393,18 +368,9 @@
 #undef HAVE_EXTRA_STRDUP_H
 #undef HAVE_EXTRA_STRICMP_H
 #undef HAVE_SSL_GET_SHUTDOWN
-#undef RECVFROM_TYPE_ARG6_IS_VOID
+#undef HAVE_IOCTLSOCKET_CAMEL
+#undef HAVE_WOLFSSL_FULL_BIO
 
-#undef HAVE_RECVFROM
-#undef RECVFROM_TYPE_ARG1
-#undef RECVFROM_TYPE_ARG2
-#undef RECVFROM_TYPE_ARG3
-#undef RECVFROM_TYPE_ARG4
-#undef RECVFROM_TYPE_ARG5
-#undef RECVFROM_TYPE_ARG6
-#undef RECVFROM_TYPE_RETV
-
-#undef NEED_MEMORY_H
 #undef NEED_REENTRANT
 #undef NEED_THREAD_SAFE
 
