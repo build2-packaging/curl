@@ -28,11 +28,11 @@ Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. These files
 can be obtained as follows:
 
-$wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.87.0-2.debian.tar.xz
-$ tar xf curl_7.87.0-2.debian.tar.xz debian/rules
+$wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.88.1-6.debian.tar.xz
+$ tar xf curl_7.88.1-6.debian.tar.xz
 
-$  wget https://kojipkgs.fedoraproject.org/packages/curl/7.87.0/1.fc38/src/curl-7.87.0-1.fc38.src.rpm
-$ rpm2cpio curl-7.87.0-1.fc38.src.rpm | cpio -civ '*.spec'
+$ wget https://kojipkgs.fedoraproject.org/packages/curl/7.88.1/1.fc39/src/curl-7.88.1-1.fc39.src.rpm
+$ rpm2cpio curl-7.88.1-1.fc39.src.rpm | cpio -civ '*.spec'
 
 As a side note, on Debian and Fedora the source, library, headers, and tools
 are packaged as follows:

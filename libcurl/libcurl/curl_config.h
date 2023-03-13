@@ -329,6 +329,11 @@
 #define HAVE_STDATOMIC_H                1
 #define HAVE_ATOMIC                     1
 
+/* SSL_set0_wbio() was added in OpenSSL 1.1.0 and we don't care about earlier
+ * versions.
+ */
+#define HAVE_SSL_SET0_WBIO              1
+
 #define STDC_HEADERS 1
 
 #undef _ALL_SOURCE
