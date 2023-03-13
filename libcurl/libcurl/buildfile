@@ -60,8 +60,8 @@ vsc{libcurl}: lib/in{libcurl}
 # Thus, we enable reprocessing for the source files which (indirectly) include
 # <stdatomic.h> for Clang versions prior to 7.0.
 #
-if ($c.id == 'clang' && $c.version.major < 7)
-  lib/obj{easy version}: cc.reprocess = true
+#if ($c.id == 'clang' && $c.version.major < 7)
+#  lib/obj{easy version}: cc.reprocess = true
 
 # Build options.
 #
