@@ -61,7 +61,7 @@ vsc{libcurl}: lib/in{libcurl}
 # <stdatomic.h> for Clang versions prior to 7.0.
 #
 if ($c.id == 'clang' && $c.version.major < 7)
-  lib/obj{easy version}: cc.reprocess = true
+  lib/obj{easy version hostip}: cc.reprocess = true
 
 # Build options.
 #
@@ -131,7 +131,7 @@ switch $tclass, $tsys
   case 'windows', 'mingw32'
   {
     c.loptions += -Wl,--enable-auto-image-base
-    c.libs     += -lws2_32 -lcrypt32
+    c.libs     += -lws2_32 -lcrypt32 -lbcrypt
   }
   case 'windows'
   {

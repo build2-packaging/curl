@@ -47,16 +47,15 @@
 
 #define CURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG 1
 
-#undef  HAVE_BORINGSSL
 #undef  USE_WOLFSSL
 
 /* Enabled features.
  */
-#define ENABLE_IPV6 1
-#define HAVE_LIBZ   1
+#define ENABLE_IPV6    1
+#define HAVE_LIBZ      1
+#define USE_WEBSOCKETS 1
 
 #undef CURL_DISABLE_COOKIES
-#undef CURL_DISABLE_CRYPTO_AUTH
 #undef CURL_DISABLE_DICT
 #undef CURL_DISABLE_DOH
 #undef CURL_DISABLE_FILE
@@ -86,6 +85,14 @@
 #undef CURL_DISABLE_HEADERS_API
 #undef CURL_DISABLE_HSTS
 #undef CURL_DISABLE_NTLM
+#undef CURL_DISABLE_AWS
+#undef CURL_DISABLE_BASIC_AUTH
+#undef CURL_DISABLE_BEARER_AUTH
+#undef CURL_DISABLE_BINDLOCAL
+#undef CURL_DISABLE_DIGEST_AUTH
+#undef CURL_DISABLE_FORM_API
+#undef CURL_DISABLE_KERBEROS_AUTH
+#undef CURL_DISABLE_NEGOTIATE_AUTH
 
 /* Diabled features.
  */
@@ -107,7 +114,6 @@
 #undef USE_NGHTTP2
 #undef USE_NGHTTP3
 #undef USE_NGTCP2
-#undef USE_NSS
 #undef USE_OPENLDAP
 #undef USE_LIBRTMP
 #undef USE_QUICHE
@@ -117,7 +123,6 @@
 #undef USE_RUSTLS
 #undef USE_WOLFSSH
 #undef USE_MSH3
-#undef USE_WEBSOCKETS
 
 /* Specific for (non-) Linux.
  */
@@ -153,12 +158,14 @@
  */
 #if defined(__FreeBSD__) || defined(__APPLE__)
 #  define HAVE_SYS_SOCKIO_H 1
+#  define HAVE_ARC4RANDOM   1
 #endif
 
 /* Specific for Linux and Mac OS.
  */
 #if defined(__linux__) || defined(__APPLE__)
-#  define HAVE_FSETXATTR 1
+#  define HAVE_FSETXATTR                   1
+#  define HAVE_CLOCK_GETTIME_MONOTONIC_RAW 1
 #endif
 
 /* Specific for POSIX.
@@ -230,6 +237,7 @@
 #  define HAVE_SYS_UTIME_H         1
 #  define HAVE_WINDOWS_H           1
 #  define HAVE_WINSOCK2_H          1
+#  define HAVE__FSEEKI64           1
 
 #  undef _UNICODE
 #  undef UNICODE
@@ -276,11 +284,9 @@
 #  define HAVE_INET_PTON               1
 #  define HAVE_LIBGEN_H                1
 #  define HAVE_PTHREAD_H               1
-#  define HAVE_SETJMP_H                1
 #  define HAVE_SIGNAL                  1
 #  define HAVE_STRCASECMP              1
 #  define HAVE_STRINGS_H               1
-#  define HAVE_STRING_H                1
 #  define HAVE_STRTOK_R                1
 #  define HAVE_SYS_PARAM_H             1
 #  define HAVE_SYS_TIME_H              1
@@ -290,6 +296,7 @@
 #  define HAVE_OPENSSL_SRP             1
 #  define HAVE_FTRUNCATE               1
 #  define HAVE_SCHED_YIELD             1
+#  define HAVE_FSEEKO                  1
 #else
 #  define USE_THREADS_WIN32 1
 #  undef  USE_THREADS_POSIX
@@ -303,7 +310,6 @@
 #define HAVE_BOOL_T                     1
 #define HAVE_FCNTL_H                    1
 #define HAVE_WS2TCPIP_H                 1
-#define HAVE_SIGNAL_H                   1
 #define HAVE_LOCALE_H                   1
 #define HAVE_SETLOCALE                  1
 #define HAVE_GETADDRINFO                1
@@ -328,6 +334,8 @@
 #define HAVE_SNPRINTF                   1
 #define HAVE_STDATOMIC_H                1
 #define HAVE_ATOMIC                     1
+#define HAVE_INTTYPES_H                 1
+#define HAVE_STDINT_H                   1
 
 /* SSL_set0_wbio() was added in OpenSSL 1.1.0 and we don't care about earlier
  * versions.
@@ -353,9 +361,7 @@
 #undef HAVE_GSSGNU
 #undef HAVE_IOCTLSOCKET_CAMEL_FIONBIO
 #undef HAVE_OLD_GSSMIT
-#undef HAVE_PK11_CREATEMANAGEDGENERICOBJECT
 #undef HAVE_PROTO_BSDSOCKET_H
-#undef HAVE_RAND_EGD
 #undef HAVE_STRCMPI
 #undef HAVE_STROPTS_H
 #undef HAVE_TERMIO_H
@@ -379,11 +385,9 @@
 #undef NEED_REENTRANT
 #undef NEED_THREAD_SAFE
 
-#undef USE_GSKIT
 #undef USE_OS400CRYPTO
 
 #undef BSD
-#undef EGD_SOCKET
 #undef CURLDEBUG
 #undef DEBUGBUILD
 #undef ENABLE_QUIC

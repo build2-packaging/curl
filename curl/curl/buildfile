@@ -11,7 +11,7 @@ tsys   = $c.target.system
 
 # Build options.
 #
-c.poptions += -DHAVE_CONFIG_H
+c.poptions += -DBUILDING_CURL -DHAVE_CONFIG_H
 
 switch $tclass, $tsys
 {

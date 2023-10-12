@@ -13,6 +13,7 @@
 *.ifc
 *.so
 *.so.*
+*.dylib
 *.dll
 *.a
 *.lib

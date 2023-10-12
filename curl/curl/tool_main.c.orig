@@ -35,10 +35,6 @@
 #include <fcntl.h>
 #endif
 
-#include <stdlib.h> /* setenv(), _putenv() */
-
-#include <libca-certificates-curl/path.h>
-
 #define ENABLE_CURLX_PRINTF
 /* use our own printf() functions */
 #include "curlx.h"
@@ -146,41 +142,6 @@ static void memory_tracking_init(void)
  */
 static CURLcode main_init(struct GlobalConfig *config)
 {
-  /* Set the SSL_CERT_FILE environment variable to refer to the bundled CA
-   * certificates, unless it is already set, and switch to the OpenSSL
-   * backend.
-   */
-  char* env = curlx_getenv ("SSL_CERT_FILE");
-
-  if (env == NULL)
-  {
-    int r;
-
-#ifndef _WIN32
-    r = setenv ("SSL_CERT_FILE", ca_certificates_file (), 0 /* overwrite */);
-#else
-    char* v = curl_maprintf ("SSL_CERT_FILE=%s", ca_certificates_file ());
-
-    if (v != NULL)
-    {
-      r = _putenv (v);
-      free (v);
-    }
-    else
-      r = -1;
-#endif
-
-    if (r == -1)
-      return CURLE_FAILED_INIT;
-  }
-  else
-    curl_free (env);
-
-  if (curl_global_sslset (CURLSSLBACKEND_OPENSSL,
-                          NULL /* name */,
-                          NULL /* avail */) != CURLSSLSET_OK)
-    return CURLE_FAILED_INIT;
-
   CURLcode result = CURLE_OK;
 
 #if defined(__DJGPP__) || defined(__GO32__)

@@ -5,11 +5,16 @@ understanding will be useful when upgrading to a new upstream version. See
 Symlink the required upstream directories into curl/:
 
 $ ln -s ../../upstream/{src,lib} curl
-$ ln -s lib/{strtoofft,nonblock,warnless,dynbuf,version_win32,curl_multibyte}.c curl
+$ ln -s lib/{strtoofft,nonblock,warnless,dynbuf,version_win32,curl_multibyte,base64}.c curl
 $ ln -s ../../libcurl/libcurl/curl_config.h curl
 
 Patch curl to use CA certificate bundle provided by the
 libca-certificates-curl package by default:
 
+$ cp curl/src/tool_main.c curl/tool_main.c.orig
 $ cp curl/src/tool_main.c curl
-$ patch -p0 <curl/tool_main.c.patch
+$ git apply curl/tool_main.c.patch
+
+Note that the above patch is produced by the following command:
+
+$ git diff >curl/tool_main.c.patch

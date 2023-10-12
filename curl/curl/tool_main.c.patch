@@ -1,9 +1,11 @@
---- curl/src/tool_main.c	2020-01-18 23:47:34.559751631 +0300
-+++ curl/tool_main.c	2020-01-20 16:07:17.183814044 +0300
-@@ -32,6 +32,10 @@
- #include <plarenas.h>
+diff --git a/curl/curl/tool_main.c b/curl/curl/tool_main.c
+index 2f132e2..494ec02 100644
+--- a/curl/curl/tool_main.c
++++ b/curl/curl/tool_main.c
+@@ -35,6 +35,10 @@
+ #include <fcntl.h>
  #endif
-
+ 
 +#include <stdlib.h> /* setenv(), _putenv() */
 +
 +#include <libca-certificates-curl/path.h>
@@ -11,7 +13,7 @@
  #define ENABLE_CURLX_PRINTF
  /* use our own printf() functions */
  #include "curlx.h"
-@@ -138,6 +142,41 @@ static void memory_tracking_init(void)
+@@ -142,6 +146,41 @@ static void memory_tracking_init(void)
   */
  static CURLcode main_init(struct GlobalConfig *config)
  {
@@ -51,5 +53,5 @@
 +    return CURLE_FAILED_INIT;
 +
    CURLcode result = CURLE_OK;
-
+ 
  #if defined(__DJGPP__) || defined(__GO32__)

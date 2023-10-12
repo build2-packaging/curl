@@ -28,11 +28,11 @@ Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. These files
 can be obtained as follows:
 
-$wget http://deb.debian.org/debian/pool/main/c/curl/curl_7.88.1-6.debian.tar.xz
-$ tar xf curl_7.88.1-6.debian.tar.xz
+$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_8.3.0-3.debian.tar.xz
+$ tar xf curl_8.3.0-3.debian.tar.xz
 
-$ wget https://kojipkgs.fedoraproject.org/packages/curl/7.88.1/1.fc39/src/curl-7.88.1-1.fc39.src.rpm
-$ rpm2cpio curl-7.88.1-1.fc39.src.rpm | cpio -civ '*.spec'
+$ wget https://kojipkgs.fedoraproject.org/packages/curl/8.4.0/1.fc40/src/curl-8.4.0-1.fc40.src.rpm
+$ rpm2cpio curl-8.4.0-1.fc40.src.rpm | cpio -civ '*.spec'
 
 As a side note, on Debian and Fedora the source, library, headers, and tools
 are packaged as follows:
@@ -48,24 +48,25 @@ Here are the discovered configuration options.
 
 Debian:
 
-  --disable-symbol-hiding --enable-versioned-symbols
-  --enable-threaded-resolver --with-lber-lib=lber
-  --with-gssapi=/usr --with-libssh2 --with-nghttp2
+  --disable-dependency-tracking --disable-symbol-hiding
+  --enable-versioned-symbols --enable-threaded-resolver --with-lber-lib=lber
+  --with-gssapi=/usr --with-nghttp2
   --with-zsh-functions-dir=/usr/share/zsh/vendor-completions
-  --with-openssl
+  --without-libssh --with-libssh2
+  --with-openssl --with-gnutls
   --with-ca-path=/etc/ssl/certs
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 Fedora:
 
-  --disable-static --enable-symbol-hiding --enable-ipv6
-  --enable-threaded-resolver --with-gssapi --with-nghttp2 --with-ssl
-  --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt
-  --enable-ldap --enable-ldaps --enable-manual --with-brotli --with-libidn2
-  --with-libpsl --with-libssh
-  --enable-hsts --without-zstd --enable-dict --enable-gopher --enable-imap
-  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
-  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
+  --disable-static --enable-hsts --enable-ipv6 --enable-symbol-hiding
+  --enable-threaded-resolver --without-zstd --with-gssapi --with-libidn2
+  --with-nghttp2 --with-ssl --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt
+  --enable-dict --enable-gopher --enable-imap --enable-ldap --enable-ldaps
+  --enable-manual --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3
+  --enable-rtsp --enable-smb --enable-smtp --enable-telnet --enable-tftp
+  --enable-tls-srp --enable-websockets --with-brotli --with-libpsl
+  --with-libssh
 
 The union of these feature sets translates into the following options:
 
@@ -74,10 +75,11 @@ The union of these feature sets translates into the following options:
   --with-nghttp2 --with-zsh-functions-dir=<path> --with-ca-path=<path>
   --with-ca-bundle=<path> --enable-ipv6 --with-openssl --enable-ldap
   --enable-ldaps --enable-manual --with-brotli --with-libidn2
-  --with-libpsl --with-libssh
+  --with-libpsl --with-libssh --with-gnutls
   --enable-hsts --enable-dict --enable-gopher --enable-imap
   --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
   --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
+  --enable-websockets
 
 We, however, drop the external dependencies that are not packaged for build2,
 disable default CA bundle/directory and use --with-ca-fallback instead,
@@ -89,11 +91,12 @@ explicitly request to use zlib and end up with the following options:
   --without-gssapi --without-libssh --without-libssh2 --without-nghttp2
   --without-zsh-functions-dir --without-brotli --without-libidn2
   --without-libpsl --without-bearssl --without-libgsasl --without-hyper
-  --without-rustls --without-wolfssh
+  --without-rustls --without-wolfssh --without-gnutls
   --without-ca-bundle --without-ca-path --with-ca-fallback
   --enable-hsts --enable-dict --enable-gopher --enable-imap
   --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
   --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
+  --enable-websockets
 
 See the configuration options description at the "Install from source" page
 (https://curl.se/docs/install.html).
@@ -151,6 +154,7 @@ $ ../configure --enable-symbol-hiding --enable-versioned-symbols \
   --enable-hsts --enable-dict --enable-gopher --enable-imap \
   --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp \
   --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp \
+  --enable-websockets \
   >build.log 2>&1
 $ make V=1 >>build.log 2>&1
 
