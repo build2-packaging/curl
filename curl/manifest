@@ -1,6 +1,6 @@
 : 1
 name: curl
-version: 8.4.0-a.0.z
+version: 8.4.0
 priority: security
 summary: Command line tool for transferring data with URLs
 license: curl ; MIT/X derivate license.
