@@ -1,5 +1,5 @@
 diff --git a/curl/curl/tool_main.c b/curl/curl/tool_main.c
-index 2f132e2..494ec02 100644
+index d0f0333..de18293 100644
 --- a/curl/curl/tool_main.c
 +++ b/curl/curl/tool_main.c
 @@ -35,6 +35,10 @@
@@ -21,7 +21,7 @@ index 2f132e2..494ec02 100644
 +   * certificates, unless it is already set, and switch to the OpenSSL
 +   * backend.
 +   */
-+  char* env = curlx_getenv ("SSL_CERT_FILE");
++  char* env = curl_getenv ("SSL_CERT_FILE");
 +
 +  if (env == NULL)
 +  {

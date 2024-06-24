@@ -28,3 +28,6 @@ _Static_assert (sizeof (time_t) == SIZEOF_TIME_T, "unexpected time_t size");
 
 _Static_assert (sizeof (curl_off_t) == SIZEOF_CURL_OFF_T,
                 "unexpected curl_off_t size");
+
+_Static_assert (sizeof (curl_socket_t) == SIZEOF_CURL_SOCKET_T,
+                "unexpected curl_socket_t size");

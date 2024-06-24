@@ -33,3 +33,7 @@ $ cat libcurl/curl_config.h | \
 
 $ diff defined-macros used-macros | grep '<' >remove-macros
 $ diff defined-macros used-macros | grep '>' >add-macros
+
+For the newly added macro definitions refer to
+<upstream-build-dir>/lib/curl_config.h on POSIX and for MinGW GCC and
+CMake/Platforms/WindowsCache.cmake or lib/config-win32.h otherwise.
