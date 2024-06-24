@@ -7,7 +7,7 @@ location: ../../openssl/openssl.git##HEAD
 
 :
 role: prerequisite
-location: ../ca-certificates-curl.git##HEAD
+location: ../ca-certificates-curl.git#1.0.5
 
 :
 role: prerequisite
