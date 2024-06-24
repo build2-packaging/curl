@@ -51,9 +51,19 @@
 
 /* Enabled features.
  */
-#define ENABLE_IPV6    1
 #define HAVE_LIBZ      1
 #define USE_WEBSOCKETS 1
+
+/* On MacOS enable IPv6 if only build with Clang, since GCC 14 fails with
+ * 'attributes should be specified before the declarator in a function
+ * definition' for some system headers (see curl's issue #13700 for details).
+ *
+ * @@ TMP On the upgrade check if this is still the case or we can get rid of
+ *        this limitation.
+ */
+#if !defined(__APPLE__) || defined(__clang__)
+#  define USE_IPV6 1
+#endif
 
 #undef CURL_DISABLE_COOKIES
 #undef CURL_DISABLE_DICT
@@ -123,6 +133,10 @@
 #undef USE_RUSTLS
 #undef USE_WOLFSSH
 #undef USE_MSH3
+#undef USE_ECH
+#undef USE_HTTP3
+#undef USE_HTTPSRR
+#undef USE_OPENSSL_QUIC
 
 /* Specific for (non-) Linux.
  */
@@ -205,19 +219,29 @@
 #  define HAVE_SYS_SELECT_H      1
 #  define HAVE_SYS_SOCKET_H      1
 #  define HAVE_SYS_UN_H          1
-#  define HAVE_SYS_WAIT_H        1
 #  define HAVE_TERMIOS_H         1
 #  define HAVE_UTIMES            1
 #  define HAVE_SUSECONDS_T       1
-#  define HAVE_FCHMOD            1
 #  define HAVE_NETINET_UDP_H     1
 #  define HAVE_SENDMSG           1
 
+/* Note that this function is present on all the supported platforms. On
+ * Windows, however, its use ends up with some nasty warnings, for example for
+ * MinGW GCC:
+ *
+ * lib\ftp.c:1167:9: warning: assignment to 'const char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+ *  1167 |       r = Curl_inet_ntop(sa->sa_family, &sa6->sin6_addr, hbuf, sizeof(hbuf));
+ *       |         ^
+ *
+ * Thus, let's disable its use on Windows.
+ *
+ * @@ TMP On the upgrade check if this is still the case or we can get rid of
+ *        this limitation.
+ */
+#  define HAVE_INET_NTOP         1
+
 #  define CURL_SA_FAMILY_T      sa_family_t
 #  define GETHOSTNAME_TYPE_ARG2 size_t
-
-#  define NTLM_WB_ENABLED        1
-#  define NTLM_WB_FILE          "/usr/bin/ntlm_auth"
 
 #  define RANDOM_FILE           "/dev/urandom"
 
@@ -235,15 +259,12 @@
 #  define HAVE_IOCTLSOCKET_FIONBIO 1
 #  define HAVE_IO_H                1
 #  define HAVE_SYS_UTIME_H         1
-#  define HAVE_WINDOWS_H           1
-#  define HAVE_WINSOCK2_H          1
 #  define HAVE__FSEEKI64           1
 
 #  undef _UNICODE
 #  undef UNICODE
 
 #  undef SOCKET
-#  undef USE_LWIPSOCK
 #  undef USE_WIN32_SMALL_FILES
 
 /* The upstream's logic of defining the macro is quite hairy. Let's not
@@ -255,7 +276,6 @@
  */
 #  undef CURL_SA_FAMILY_T
 #  undef GETHOSTNAME_TYPE_ARG2
-#  undef USE_WINSOCK
 #  undef WIN32_LEAN_AND_MEAN
 
 /* Unused on Windows (see include/curl/curl.h for details).
@@ -280,8 +300,6 @@
 
 #  define HAVE_BASENAME                1
 #  define HAVE_CLOCK_GETTIME_MONOTONIC 1
-#  define HAVE_INET_NTOP               1
-#  define HAVE_INET_PTON               1
 #  define HAVE_LIBGEN_H                1
 #  define HAVE_PTHREAD_H               1
 #  define HAVE_SIGNAL                  1
@@ -292,11 +310,13 @@
 #  define HAVE_SYS_TIME_H              1
 #  define HAVE_UNISTD_H                1
 #  define HAVE_UTIME_H                 1
-#  define HAVE_VARIADIC_MACROS_GCC     1
 #  define HAVE_OPENSSL_SRP             1
 #  define HAVE_FTRUNCATE               1
 #  define HAVE_SCHED_YIELD             1
 #  define HAVE_FSEEKO                  1
+#  define HAVE_DECL_FSEEKO             1
+#  define HAVE_DIRENT_H                1
+#  define HAVE_OPENDIR                 1
 #else
 #  define USE_THREADS_WIN32 1
 #  undef  USE_THREADS_POSIX
@@ -309,7 +329,6 @@
 #define HAVE_STDBOOL_H                  1
 #define HAVE_BOOL_T                     1
 #define HAVE_FCNTL_H                    1
-#define HAVE_WS2TCPIP_H                 1
 #define HAVE_LOCALE_H                   1
 #define HAVE_SETLOCALE                  1
 #define HAVE_GETADDRINFO                1
@@ -329,13 +348,11 @@
 #define HAVE_SYS_STAT_H                 1
 #define HAVE_SYS_TYPES_H                1
 #define HAVE_UTIME                      1
-#define HAVE_VARIADIC_MACROS_C99        1
 #define HAVE_STRICMP                    1
 #define HAVE_SNPRINTF                   1
 #define HAVE_STDATOMIC_H                1
 #define HAVE_ATOMIC                     1
-#define HAVE_INTTYPES_H                 1
-#define HAVE_STDINT_H                   1
+#define HAVE_INET_PTON                  1
 
 /* SSL_set0_wbio() was added in OpenSSL 1.1.0 and we don't care about earlier
  * versions.
@@ -344,7 +361,6 @@
 
 #define STDC_HEADERS 1
 
-#undef _ALL_SOURCE
 #undef _LARGE_FILES
 #undef _FILE_OFFSET_BITS
 
@@ -390,7 +406,6 @@
 #undef BSD
 #undef CURLDEBUG
 #undef DEBUGBUILD
-#undef ENABLE_QUIC
 
 /* While upstream defines the macro for Clang, it fails to build for older
  * version of Clang on Mac OS. Thus, we never define it.
@@ -472,11 +487,22 @@
 #endif
 
 /* Is always 8 bytes for any platform that provides a 64-bit signed integral
- * data type (see include/curl/system.h for details) and we can parobably
+ * data type (see include/curl/system.h for details) and we can probably
  * assume that's the case for the platforms we build for. We also check this
  * at the compile time using _Static_assert() in assert.c.
  */
 #define SIZEOF_CURL_OFF_T 8
+
+/* Define this macro in the same way as lib/curl_setup.h defines it as a
+   fallback. Also check the defined value at the compile time using
+   _Static_assert() in assert.c.
+ */
+#ifdef _WIN64
+#  define SIZEOF_CURL_SOCKET_T 8
+#else
+#  define SIZEOF_CURL_SOCKET_T 4
+#endif
+
 
 #define SEND_QUAL_ARG2 const
 

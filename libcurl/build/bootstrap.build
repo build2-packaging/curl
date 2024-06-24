@@ -24,7 +24,7 @@ using dist
 #
 # https://curl.se/libcurl/abi.html
 #
-if ($version.major == 8 && $version.minor == 4 && $version.patch == 0)
+if ($version.major == 8 && $version.minor == 8 && $version.patch == 0)
 {
   abi_version_major = 4
   abi_version = "$abi_version_major.8.0" # <current - age>.<age>.<revision>

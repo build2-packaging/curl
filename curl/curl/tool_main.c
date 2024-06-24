@@ -25,7 +25,7 @@
 
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <tchar.h>
 #endif
 
@@ -112,7 +112,7 @@ static void memory_tracking_init(void)
 {
   char *env;
   /* if CURL_MEMDEBUG is set, this starts memory tracking message logging */
-  env = curlx_getenv("CURL_MEMDEBUG");
+  env = curl_getenv("CURL_MEMDEBUG");
   if(env) {
     /* use the value as file name */
     char fname[CURL_MT_LOGFNAME_BUFSIZE];
@@ -126,7 +126,7 @@ static void memory_tracking_init(void)
        without an alloc! */
   }
   /* if CURL_MEMLIMIT is set, this enables fail-on-alloc-number-N feature */
-  env = curlx_getenv("CURL_MEMLIMIT");
+  env = curl_getenv("CURL_MEMLIMIT");
   if(env) {
     char *endptr;
     long num = strtol(env, &endptr, 10);
@@ -150,7 +150,7 @@ static CURLcode main_init(struct GlobalConfig *config)
    * certificates, unless it is already set, and switch to the OpenSSL
    * backend.
    */
-  char* env = curlx_getenv ("SSL_CERT_FILE");
+  char* env = curl_getenv ("SSL_CERT_FILE");
 
   if (env == NULL)
   {
@@ -259,6 +259,7 @@ static void main_free(struct GlobalConfig *config)
 #ifdef _UNICODE
 #if defined(__GNUC__)
 /* GCC doesn't know about wmain() */
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #endif
@@ -273,7 +274,7 @@ int main(int argc, char *argv[])
 
   tool_init_stderr();
 
-#ifdef WIN32
+#ifdef _WIN32
   /* Undocumented diagnostic option to list the full paths of all loaded
      modules. This is purposely pre-init. */
   if(argc == 2 && !_tcscmp(argv[1], _T("--dump-module-paths"))) {
@@ -287,7 +288,7 @@ int main(int argc, char *argv[])
   result = win32_init();
   if(result) {
     errorf(&global, "(%d) Windows-specific init failed", result);
-    return result;
+    return (int)result;
   }
 #endif
 
@@ -314,7 +315,7 @@ int main(int argc, char *argv[])
     main_free(&global);
   }
 
-#ifdef WIN32
+#ifdef _WIN32
   /* Flush buffers of all streams opened in write or update mode */
   fflush(NULL);
 #endif
@@ -325,5 +326,11 @@ int main(int argc, char *argv[])
   return (int)result;
 #endif
 }
+
+#ifdef _UNICODE
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 #endif /* ndef UNITTESTS */

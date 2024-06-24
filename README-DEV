@@ -28,11 +28,11 @@ Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. These files
 can be obtained as follows:
 
-$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_8.3.0-3.debian.tar.xz
-$ tar xf curl_8.3.0-3.debian.tar.xz
+$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_8.8.0-1.debian.tar.xz
+$ tar xf curl_8.8.0-1.debian.tar.xz
 
-$ wget https://kojipkgs.fedoraproject.org/packages/curl/8.4.0/1.fc40/src/curl-8.4.0-1.fc40.src.rpm
-$ rpm2cpio curl-8.4.0-1.fc40.src.rpm | cpio -civ '*.spec'
+$ wget https://kojipkgs.fedoraproject.org/packages/curl/8.8.0/1.fc41/src/curl-8.8.0-1.fc41.src.rpm
+$ rpm2cpio curl-8.8.0-1.fc41.src.rpm | cpio -civ '*.spec'
 
 As a side note, on Debian and Fedora the source, library, headers, and tools
 are packaged as follows:
@@ -66,7 +66,7 @@ Fedora:
   --enable-manual --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3
   --enable-rtsp --enable-smb --enable-smtp --enable-telnet --enable-tftp
   --enable-tls-srp --enable-websockets --with-brotli --with-libpsl
-  --with-libssh
+  --with-libssh --with-zsh-functions-dir
 
 The union of these feature sets translates into the following options:
 
@@ -96,7 +96,7 @@ explicitly request to use zlib and end up with the following options:
   --enable-hsts --enable-dict --enable-gopher --enable-imap
   --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
   --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
-  --enable-websockets
+  --enable-websockets --without-zsh-functions-dir
 
 See the configuration options description at the "Install from source" page
 (https://curl.se/docs/install.html).
