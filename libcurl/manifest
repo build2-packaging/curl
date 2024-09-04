@@ -1,6 +1,6 @@
 : 1
 name: libcurl
-version: 8.8.0
+version: 8.8.0+1
 project: curl
 priority: security
 summary: C library for transferring data with URLs
@@ -19,5 +19,5 @@ builds: -wasm
 depends: * build2 >= 0.15.0
 depends: * bpkg >= 0.15.0
 depends: libz ^1.2.1100
-depends: libcrypto ^1.1.1
-depends: libssl ^1.1.1
+depends: libcrypto >= 1.1.1
+depends: libssl >= 1.1.1
