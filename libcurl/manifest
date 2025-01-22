@@ -1,6 +1,6 @@
 : 1
 name: libcurl
-version: 8.8.0+1
+version: 8.8.0+2
 project: curl
 priority: security
 summary: C library for transferring data with URLs

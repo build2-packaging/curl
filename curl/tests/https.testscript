@@ -4,7 +4,7 @@
 : default
 :
 {
-  $* --fail --location -sS 'https://www.example.com' >>~%EOO%
+  $* --fail --location -sS 'https://cppget.org/robots.txt' >>~%EOO%
     %.+
     EOO
 }
@@ -16,5 +16,5 @@
 : certificates' exit code.
 :
 {
-  $* -s 'https://www.example.com' --capath "$src_base/empty.pem" == 60
+  $* -s 'https://cppget.org/robots.txt' --capath "$src_base/empty.pem" == 60
 }

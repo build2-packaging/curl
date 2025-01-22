@@ -3,7 +3,7 @@
 
 : http
 :
-$* --verbose 'http://www.example.com' >>~%EOO% 2>!
+$* --verbose 'http://cppget.org/robots.txt' >>~%EOO% 2>!
   %.+
   EOO
 
@@ -16,11 +16,11 @@ $* --verbose 'http://www.example.com' >>~%EOO% 2>!
 if ($c.target.class == 'windows' || \
     $c.target.class == 'macos' && $c.id == 'clang-apple')
 {
-  $* 'https://www.example.com' >>~%EOO%
+  $* 'https://cppget.org/robots.txt' >>~%EOO%
     %.+
     EOO
 }
 else
 {
-  $* 'https://www.example.com' 2>~'%failed to request .+%' != 0
+  $* 'https://cppget.org/robots.txt' 2>~'%failed to request .+%' != 0
 }

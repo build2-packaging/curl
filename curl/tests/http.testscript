@@ -3,6 +3,6 @@
 
 : basic
 :
-$* --fail --location -sS 'http://www.example.com' >>~%EOO%
+$* --fail --location -sS 'http://cppget.org/robots.txt' >>~%EOO%
   %.+
   EOO

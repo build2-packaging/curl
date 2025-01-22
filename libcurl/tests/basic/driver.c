@@ -54,7 +54,6 @@ main (int argc, char* argv[])
 
     curl_easy_setopt (curl, CURLOPT_URL, url);
     curl_easy_setopt (curl, CURLOPT_TIMEOUT, 600L);      /* 10 mins. */
-    curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1L);
 
     char agent[] = "libcurl-test/" LIBCURL_VERSION;
     curl_easy_setopt (curl, CURLOPT_USERAGENT, agent);
@@ -77,7 +76,7 @@ main (int argc, char* argv[])
 
       if (cr == CURLE_OK)
       {
-        if (status == 200)
+        if (status == 200 || (status >= 300 && status < 400))
         {
           if (v != 0)
             fprintf (stderr, "calling fflush()\n");
