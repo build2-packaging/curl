@@ -1,7 +1,6 @@
 : 1
 name: curl
-version: 8.8.0+2
-priority: security
+version: 8.8.0+3
 summary: Command line tool for transferring data with URLs
 license: curl ; MIT/X derivate license.
 topics: HTTP, FTP, URL, data transfer

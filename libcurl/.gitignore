@@ -24,3 +24,7 @@
 *.exe.dlls/
 *.exe.manifest
 *.pc
+
+# Compilation database.
+#
+compile_commands.json
