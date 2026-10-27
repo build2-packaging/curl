@@ -1,1 +1,0 @@
-lib/version_win32.c

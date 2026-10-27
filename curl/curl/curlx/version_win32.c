@@ -1,0 +1,1 @@
+../lib/curlx/version_win32.c

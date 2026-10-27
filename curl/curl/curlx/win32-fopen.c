@@ -1,0 +1,1 @@
+../lib/curlx/win32-fopen.c

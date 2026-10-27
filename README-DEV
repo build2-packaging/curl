@@ -28,11 +28,11 @@ Debian and Fedora distributions. The configuration options defining these sets
 are specified in the Debian's rules and Fedora's RPM .spec files. These files
 can be obtained as follows:
 
-$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_8.8.0-1.debian.tar.xz
-$ tar xf curl_8.8.0-1.debian.tar.xz
+$ wget http://deb.debian.org/debian/pool/main/c/curl/curl_8.23.0-1.debian.tar.xz
+$ tar xf curl_8.23.0-1.debian.tar.xz
 
-$ wget https://kojipkgs.fedoraproject.org/packages/curl/8.8.0/1.fc41/src/curl-8.8.0-1.fc41.src.rpm
-$ rpm2cpio curl-8.8.0-1.fc41.src.rpm | cpio -civ '*.spec'
+$ wget https://kojipkgs.fedoraproject.org/packages/curl/8.23.0/1.fc46/src/curl-8.23.0-1.fc46.src.rpm
+$ rpm2cpio curl-8.23.0-1.fc46.src.rpm | cpio -civ '*.spec'
 
 As a side note, on Debian and Fedora the source, library, headers, and tools
 are packaged as follows:
@@ -48,125 +48,128 @@ Here are the discovered configuration options.
 
 Debian:
 
-  --disable-dependency-tracking --disable-symbol-hiding
+  --disable-dependency-tracking --enable-symbol-hiding
   --enable-versioned-symbols --enable-threaded-resolver --with-lber-lib=lber
-  --with-gssapi=/usr --with-nghttp2
+  --with-gssapi=/usr --with-nghttp2 --with-ngtcp2 --with-nghttp3
   --with-zsh-functions-dir=/usr/share/zsh/vendor-completions
+  --with-fish-functions-dir=/usr/share/fish/vendor_completions.d
   --without-libssh --with-libssh2
   --with-openssl --with-gnutls
   --with-ca-path=/etc/ssl/certs
   --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
-Fedora:
+Fedora (the full build):
 
-  --disable-static --enable-hsts --enable-ipv6 --enable-symbol-hiding
-  --enable-threaded-resolver --without-zstd --with-gssapi --with-libidn2
-  --with-nghttp2 --with-ssl --with-ca-bundle=/etc/pki/tls/certs/ca-bundle.crt
-  --enable-dict --enable-gopher --enable-imap --enable-ldap --enable-ldaps
-  --enable-manual --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3
+  --disable-manual --disable-static --enable-hsts --enable-ipv6
+  --enable-symbol-hiding --enable-threaded-resolver --with-gssapi
+  --with-libidn2 --with-nghttp2 --with-ssl
+  --with-ca-bundle=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+  --with-zsh-functions-dir --enable-dict --enable-gopher --enable-imap
+  --enable-ldap --enable-ldaps --enable-mqtt --enable-ntlm --enable-pop3
   --enable-rtsp --enable-smb --enable-smtp --enable-telnet --enable-tftp
   --enable-tls-srp --enable-websockets --with-brotli --with-libpsl
-  --with-libssh --with-zsh-functions-dir
+  --with-libssh --with-zstd --with-nghttp3 --with-ngtcp2
+
+Note that upstream has dropped SMB and TLS-SRP support and so the configure
+script ignores the --enable-smb and --enable-tls-srp options.
 
 The union of these feature sets translates into the following options:
 
   --enable-symbol-hiding --enable-versioned-symbols
   --enable-threaded-resolver --with-lber-lib=lber --with-gssapi --with-libssh2
-  --with-nghttp2 --with-zsh-functions-dir=<path> --with-ca-path=<path>
+  --with-nghttp2 --with-ngtcp2 --with-nghttp3 --with-zsh-functions-dir=<path>
+  --with-fish-functions-dir=<path> --with-ca-path=<path>
   --with-ca-bundle=<path> --enable-ipv6 --with-openssl --enable-ldap
-  --enable-ldaps --enable-manual --with-brotli --with-libidn2
+  --enable-ldaps --with-brotli --with-zstd --with-libidn2
   --with-libpsl --with-libssh --with-gnutls
   --enable-hsts --enable-dict --enable-gopher --enable-imap
-  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
-  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
-  --enable-websockets
+  --enable-mqtt --enable-ntlm --enable-pop3 --enable-rtsp
+  --enable-smtp --enable-telnet --enable-tftp --enable-websockets
 
 We, however, drop the external dependencies that are not packaged for build2,
 disable default CA bundle/directory and use --with-ca-fallback instead,
-explicitly request to use zlib and end up with the following options:
+explicitly request to use zlib, brotli, and zstd, and end up with the
+following options:
 
-  --enable-symbol-hiding --enable-versioned-symbols --enable-threaded-resolve
-  --enable-ipv6 --with-openssl --with-zlib --disable-ldap --disable-ldaps
-  --disable-ares --disable-esni --disable-manual --without-lber-lib
-  --without-gssapi --without-libssh --without-libssh2 --without-nghttp2
-  --without-zsh-functions-dir --without-brotli --without-libidn2
-  --without-libpsl --without-bearssl --without-libgsasl --without-hyper
-  --without-rustls --without-wolfssh --without-gnutls
-  --without-ca-bundle --without-ca-path --with-ca-fallback
-  --enable-hsts --enable-dict --enable-gopher --enable-imap
-  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp
-  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp
-  --enable-websockets --without-zsh-functions-dir
+  --enable-symbol-hiding --enable-versioned-symbols
+  --enable-threaded-resolver --enable-ipv6 --with-openssl --with-zlib
+  --with-brotli --with-zstd --disable-ldap --disable-ldaps --disable-ares
+  --disable-manual --without-lber-lib --without-gssapi --without-libssh
+  --without-libssh2 --without-nghttp2 --without-ngtcp2 --without-nghttp3
+  --without-zsh-functions-dir --without-fish-functions-dir
+  --without-libidn2 --without-libpsl --without-libgsasl --without-rustls
+  --without-gnutls --without-ca-bundle --without-ca-path --with-ca-fallback
+  --enable-hsts --enable-dict --enable-gopher --enable-imap --enable-mqtt
+  --enable-ntlm --enable-pop3 --enable-rtsp --enable-smtp --enable-telnet
+  --enable-tftp --enable-websockets
 
 See the configuration options description at the "Install from source" page
 (https://curl.se/docs/install.html).
 
-On Windows and MacOS we also enable the SSL backend provided by the system and
-make it a default one. On MacOS we add the following configuration options:
+On Windows we also enable the SSL backend provided by the system and make it
+a default one. For MinGW GCC we add the following configuration options:
 
-  --with-secure-transport --with-default-ssl-backend=secure-transport
+  --with-schannel --with-default-ssl-backend=schannel
 
-Note, though, that on MacOS building curl with GCC fails for the Secure
-Transport backend enabled (see curl issue 4821 for details). Thus, we disable
-it for GCC on MacOS (see libcurl/curl_config.h for details).
+For MSVC we pass the following options to CMake (see below):
 
-For MSVC there is no easy way to request that via the configuration script, so
-we apply the following patch to winbuild/MakefileBuild.vc:
+  -DCURL_USE_SCHANNEL=ON -DCURL_DEFAULT_SSL_BACKEND=schannel
 
---- winbuild/MakefileBuild.vc.orig	2020-01-11 18:04:21.353519085 +0300
-+++ winbuild/MakefileBuild.vc	2020-01-11 18:08:35.962111020 +0300
-@@ -345,7 +345,7 @@ USE_WINSSL  = true
- !IF "$(USE_SSPI)"!="true"
- !ERROR cannot build with WinSSL without SSPI
- !ENDIF
--SSPI_CFLAGS = $(SSPI_CFLAGS) /DUSE_SCHANNEL
-+SSPI_CFLAGS = $(SSPI_CFLAGS) /DUSE_SCHANNEL /DCURL_DEFAULT_SSL_BACKEND=\"schannel\" /DCURL_CA_FALLBACK=1
- WIN_LIBS    = $(WIN_LIBS) Crypt32.lib
- !ENDIF
+Upstream has dropped the Secure Transport backend and now offers the Apple
+SecTrust certificate verification for the OpenSSL backend instead. Note that
+it is only used for the native CA store (CURLSSLOPT_NATIVE_CA, etc), so its
+enabling doesn't change the default behavior. On MacOS we add the following
+configuration option:
+
+  --with-apple-sectrust
+
+Note, though, that lib/vtls/apple.c includes <Security/Security.h> which fails
+to compile with GCC (see curl issue 4821 for details). Thus, we disable it
+for GCC on MacOS (see libcurl/curl_config.h for details).
 
 Normally, when packaging a project, we need to replace some auto-generated
 headers with our own implementations and deduce compilation/linking options.
 For cURL we can rely for that on configure.ac, m4/curl-compilers.m4,
-{lib,src}/Makefile.am, and winbuild/MakefileBuild.vc. In practice, however,
-that can be uneasy and error prone, so you may also need to see the
-auto-generated files and the actual compiler and linker command lines in the
-build log. If that's the case, you can configure/build the upstream package on
-the platform of interest running the following commands in the upstream
-project root directory.
+{lib,src}/Makefile.am, and CMakeLists.txt. In practice, however, that can be
+uneasy and error prone, so you may also need to see the auto-generated files
+and the actual compiler and linker command lines in the build log. If that's
+the case, you can configure/build the upstream package on the platform of
+interest running the following commands in the upstream project root
+directory.
 
-On POSIX and for MinGW GCC (add
---with-secure-transport --with-default-ssl-backend=secure-transport for MacOS
-and
+On POSIX and for MinGW GCC (add --with-apple-sectrust for MacOS and
 --with-schannel --with-default-ssl-backend=schannel for MinGW GCC):
 
 $ autoreconf -fi
 $ mkdir build
 $ cd build
 $ ../configure --enable-symbol-hiding --enable-versioned-symbols \
-  --enable-threaded-resolve --enable-ipv6 --with-openssl --with-zlib \
-  --disable-ldap --disable-ldaps --disable-ares --disable-esni \
+  --enable-threaded-resolver --enable-ipv6 --with-openssl --with-zlib \
+  --with-brotli --with-zstd --disable-ldap --disable-ldaps --disable-ares \
   --disable-manual --without-lber-lib --without-gssapi --without-libssh \
-  --without-libssh2 --without-nghttp2 --without-zsh-functions-dir \
-  --without-brotli --without-libidn2 --without-libpsl \
-  --without-bearssl --without-libgsasl --without-hyper \
-  --without-rustls --without-wolfssh \
-  --without-ca-bundle --without-ca-path --with-ca-fallback \
-  --enable-hsts --enable-dict --enable-gopher --enable-imap \
-  --enable-mqtt --enable-ntlm --enable-ntlm-wb --enable-pop3 --enable-rtsp \
-  --enable-smb --enable-smtp --enable-telnet --enable-tftp --enable-tls-srp \
-  --enable-websockets \
+  --without-libssh2 --without-nghttp2 --without-ngtcp2 --without-nghttp3 \
+  --without-zsh-functions-dir --without-fish-functions-dir \
+  --without-libidn2 --without-libpsl --without-libgsasl --without-rustls \
+  --without-gnutls --without-ca-bundle --without-ca-path --with-ca-fallback \
+  --enable-hsts --enable-dict --enable-gopher --enable-imap --enable-mqtt \
+  --enable-ntlm --enable-pop3 --enable-rtsp --enable-smtp --enable-telnet \
+  --enable-tftp --enable-websockets \
   >build.log 2>&1
 $ make V=1 >>build.log 2>&1
 
-For MSVC:
+For MSVC (upstream has dropped the winbuild/ makefiles and so we use CMake):
 
-> buildconf.bat
-> cd winbuild
-> nmake /f Makefile.vc mode=dll ENABLE_WINSSL=yes ^
-    WITH_SSL=dll ENABLE_OPENSSL_AUTO_LOAD_CONFIG=no ^
-    WITH_ZLIB=dll >build.log 2>&1
+> cmake -B build -DBUILD_STATIC_LIBS=OFF -DCURL_USE_OPENSSL=ON ^
+    -DCURL_USE_SCHANNEL=ON -DCURL_DEFAULT_SSL_BACKEND=schannel ^
+    -DCURL_CA_BUNDLE=none -DCURL_CA_PATH=none -DCURL_CA_FALLBACK=ON ^
+    -DCURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG=ON -DCURL_ZLIB=ON ^
+    -DCURL_BROTLI=ON -DCURL_ZSTD=ON -DCURL_DISABLE_LDAP=ON ^
+    -DUSE_NGHTTP2=OFF -DUSE_LIBIDN2=OFF -DCURL_USE_LIBPSL=OFF ^
+    -DCURL_USE_LIBSSH2=OFF -DENABLE_CURL_MANUAL=OFF >build.log 2>&1
+> cmake --build build --verbose >>build.log 2>&1
 
-See the upstream/docs/INSTALL.md for details.
+See the upstream/docs/INSTALL.md and upstream/docs/INSTALL-CMAKE.md for
+details.
 
 When the packaging is complete, build all the project packages in source tree
 and make sure that no cURL headers are included from the system, running the

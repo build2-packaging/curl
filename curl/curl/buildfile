@@ -4,7 +4,10 @@
 import libs  = libcurl%lib{curl}
 import libs += libca-certificates-curl%lib{ca-certificates-curl}
 
-exe{curl}: h{**} c{** -src/tool_main -lib/**} $libs
+# Note that src/curlinfo.c is the source file of the upstream's auxiliary
+# program which prints the build information and is not installed.
+#
+exe{curl}: h{**} c{** -src/tool_main -src/curlinfo -lib/**} $libs
 
 tclass = $c.target.class
 tsys   = $c.target.system
@@ -46,8 +49,8 @@ switch $tclass, $tsys
     c.libs += -pthread
 
   case 'windows', 'mingw32'
-    c.libs+= -lws2_32
+    c.libs += -lws2_32 -lbcrypt
 
   case 'windows'
-    c.libs += ws2_32.lib
+    c.libs += ws2_32.lib bcrypt.lib
 }

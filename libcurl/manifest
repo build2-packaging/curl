@@ -1,6 +1,6 @@
 : 1
 name: libcurl
-version: 8.8.0+3
+version: 8.23.0-a.0.z
 project: curl
 summary: C library for transferring data with URLs
 license: curl ; MIT/X derivate license.
@@ -18,5 +18,7 @@ builds: -wasm
 depends: * build2 >= 0.15.0
 depends: * bpkg >= 0.15.0
 depends: libz ^1.2.1100
-depends: libcrypto >= 1.1.1
-depends: libssl >= 1.1.1
+depends: libbrotli ^1.0.9
+depends: libzstd ^1.4.0
+depends: libcrypto >= 3.0.0
+depends: libssl >= 3.0.0

@@ -9,6 +9,8 @@ vsc{*}: extension = vers
 import imp_libs  = libssl%lib{ssl}
 import imp_libs += libcrypto%lib{crypto}
 import imp_libs += libz%lib{z}
+import imp_libs += libbrotli%lib{brotlidec}
+import imp_libs += libzstd%lib{zstd}
 
 lib{curl}: {h c}{**} $imp_libs
 
@@ -22,11 +24,17 @@ windows = ($tclass == 'windows')
 
 libs{curl}: vsc{libcurl}: include = ($linux || $bsd ? adhoc : false)
 
+# Note that upstream composes the symbol version name from two adjacent
+# substitutions (CURL_@...PREFIX@@...SONAME@) and so we use the lax mode,
+# where the double substitution symbol is not treated as an escape sequence.
+#
 vsc{libcurl}: lib/in{libcurl}
 {
   in.symbol = '@'
+  in.mode   = lax
 
-  CURL_LT_SHLIB_VERSIONED_FLAVOUR = 'OPENSSL_'
+  CURL_LIBCURL_VERSIONED_SYMBOLS_PREFIX = 'OPENSSL_'
+  CURL_LIBCURL_VERSIONED_SYMBOLS_SONAME = $abi_version_major
 }
 
 # It seems that for earlier versions of clang the __has_include_next() macro
@@ -65,8 +73,7 @@ if ($c.id == 'clang' && $c.version.major < 7)
 
 # Build options.
 #
-c.poptions += -DBUILDING_LIBCURL -DHAVE_CONFIG_H \
-              -DOS="\"$c.target\"" -DVERSION="\"$version.project_id\""
+c.poptions += -DBUILDING_LIBCURL -DHAVE_CONFIG_H -DCURL_OS="\"$c.target\""
 
 if! $windows
   c.poptions += -DCURL_HIDDEN_SYMBOLS
@@ -123,17 +130,19 @@ switch $tclass, $tsys
     # generating/passing the exported symbol list file.
     #
     c.libs += -framework CoreFoundation      \
+              -framework CoreServices        \
               -framework SystemConfiguration \
               -framework Security
   }
   case 'windows', 'mingw32'
   {
     c.loptions += -Wl,--enable-auto-image-base
-    c.libs     += -lws2_32 -lcrypt32 -lbcrypt
+    c.libs     += -lws2_32 -liphlpapi -lsecur32 -lcrypt32 -lbcrypt -ladvapi32
   }
   case 'windows'
   {
-    c.libs += ws2_32.lib crypt32.lib normaliz.lib advapi32.lib
+    c.libs += ws2_32.lib iphlpapi.lib secur32.lib crypt32.lib bcrypt.lib \
+              normaliz.lib advapi32.lib
   }
 }
 

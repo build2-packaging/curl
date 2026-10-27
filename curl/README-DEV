@@ -5,8 +5,13 @@ understanding will be useful when upgrading to a new upstream version. See
 Symlink the required upstream directories into curl/:
 
 $ ln -s ../../upstream/{src,lib} curl
-$ ln -s lib/{strtoofft,nonblock,warnless,dynbuf,version_win32,curl_multibyte,base64}.c curl
 $ ln -s ../../libcurl/libcurl/curl_config.h curl
+
+Symlink the libcurl source files that upstream also compiles into curl (see
+CURLX_CFILES in curl/src/Makefile.inc for the list):
+
+$ mkdir curl/curlx
+$ ln -s ../lib/curlx/{base64,basename,dynbuf,win32-fopen,multibyte,nonblock,strcopy,strdup,strerr,strparse,timediff,timeval,version_win32,wait,warnless,winapi}.c curl/curlx
 
 Patch curl to use CA certificate bundle provided by the
 libca-certificates-curl package by default:

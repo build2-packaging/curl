@@ -12,3 +12,11 @@ location: ../ca-certificates-curl.git##HEAD
 :
 role: prerequisite
 location: ../../zlib/zlib.git##HEAD
+
+:
+role: prerequisite
+location: https://github.com/build2-packaging/brotli.git##HEAD
+
+:
+role: prerequisite
+location: https://github.com/build2-packaging/zstd.git##HEAD

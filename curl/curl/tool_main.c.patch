@@ -1,8 +1,8 @@
 diff --git a/curl/curl/tool_main.c b/curl/curl/tool_main.c
-index d0f0333..de18293 100644
+index d3eff9c..517699d 100644
 --- a/curl/curl/tool_main.c
 +++ b/curl/curl/tool_main.c
-@@ -35,6 +35,10 @@
+@@ -33,6 +33,10 @@
  #include <fcntl.h>
  #endif
  
@@ -10,17 +10,20 @@ index d0f0333..de18293 100644
 +
 +#include <libca-certificates-curl/path.h>
 +
- #define ENABLE_CURLX_PRINTF
- /* use our own printf() functions */
- #include "curlx.h"
-@@ -142,6 +146,41 @@ static void memory_tracking_init(void)
-  */
- static CURLcode main_init(struct GlobalConfig *config)
- {
-+  /* Set the SSL_CERT_FILE environment variable to refer to the bundled CA
-+   * certificates, unless it is already set, and switch to the OpenSSL
-+   * backend.
-+   */
+ #include "tool_cfgable.h"
+ #include "tool_doswin.h"
+ #include "tool_msgs.h"
+@@ -137,6 +141,47 @@ static void memory_tracking_init(void)
+ #  define memory_tracking_init() tool_nop_stmt
+ #endif
+ 
++/*
++ * Set the SSL_CERT_FILE environment variable to refer to the bundled CA
++ * certificates, unless it is already set, and switch to the OpenSSL backend.
++ * Must be called before the curl library is initialized.
++ */
++static CURLcode ca_certificates_init(void)
++{
 +  char* env = curl_getenv ("SSL_CERT_FILE");
 +
 +  if (env == NULL)
@@ -35,7 +38,7 @@ index d0f0333..de18293 100644
 +    if (v != NULL)
 +    {
 +      r = _putenv (v);
-+      free (v);
++      curl_free (v);
 +    }
 +    else
 +      r = -1;
@@ -52,6 +55,23 @@ index d0f0333..de18293 100644
 +                          NULL /* avail */) != CURLSSLSET_OK)
 +    return CURLE_FAILED_INIT;
 +
-   CURLcode result = CURLE_OK;
++  return CURLE_OK;
++}
++
+ /*
+  * curl tool main function.
+  */
+@@ -190,9 +235,12 @@ int main(int argc, char *argv[])
+   /* Initialize memory tracking */
+   memory_tracking_init();
  
- #if defined(__DJGPP__) || defined(__GO32__)
++  result = ca_certificates_init();
++
+   /* Initialize the curl library - do not call any libcurl functions before
+      this point */
+-  result = globalconf_init();
++  if(!result)
++    result = globalconf_init();
+   if(!result) {
+     /* Start our curl operation */
+     result = operate(argc, argv);
